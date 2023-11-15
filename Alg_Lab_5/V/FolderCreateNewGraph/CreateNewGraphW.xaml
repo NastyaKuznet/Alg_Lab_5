@@ -1,0 +1,29 @@
+﻿<Window x:Class="Alg_Lab_5.V.FolderCreateNewGraph.CreateNewGraphW"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Alg_Lab_5.V.FolderCreateNewGraph"
+        mc:Ignorable="d"
+        Title="CreateNewGraphW" Height="200" Width="500" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition/>
+            <RowDefinition Height="0.5*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <Frame Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Content="{Binding CurrentPage}" NavigationUIVisibility="Hidden"/>
+        <Grid Grid.Column="1" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button x:Name="Undo" Grid.Row="0" Margin="10" Content="Назад" Command="{Binding Undo}" IsEnabled="{Binding IsEnabledUndo}"/>
+            <Button x:Name="ApplyNext" Grid.Row="1" Margin="10" Content="Применить" Command="{Binding Apply}"/>
+        </Grid>
+    </Grid>
+</Window>
