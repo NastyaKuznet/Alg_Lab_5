@@ -50,5 +50,31 @@ namespace Alg_Lab_5.M
         {
             return posX > SizeNodeGraph / 2 && posY > SizeNodeGraph / 2;
         }
+
+        public void DrawBaseLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas)
+        {
+            Line edge = new Line
+            {
+                X1 = firstPosX,
+                Y1 = firstPosY,
+                X2 = secondPosX,
+                Y2 = secondPosY,
+                Stroke = ColorForeGroundTextGraph
+            };
+            canvas.Children.Add(edge);
+        }
+
+        public NodeGraph FindNodeInTouch(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
+        {
+            foreach(NodeGraph node in nodesGraph)
+            {
+                double radius = Math.Sqrt(Math.Pow(posX - node.PosX, 2) + Math.Pow(posY - node.PosY, 2));
+                if (radius < SizeNodeGraph)
+                {
+                    return node;
+                }
+            }
+            return null;
+        }
     }
 }

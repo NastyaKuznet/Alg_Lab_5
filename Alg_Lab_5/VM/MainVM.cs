@@ -140,6 +140,72 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private ObservableCollection<string> _typeEdges = new ObservableCollection<string> { "Неориентированные", "Ориентированные"};
+        public ObservableCollection<string> TypeEdges
+        {
+            get { return _typeEdges; }
+            set
+            {
+                _typeEdges = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _selectedType = "Неориентированные";
+        public string SelectedType
+        {
+            get { return _selectedType; }
+            set
+            {
+                _selectedType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isHasWeight = false;
+        public bool IsHasWeight
+        {
+            get { return _isHasWeight; }
+            set
+            {
+                _isHasWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<EdgeGraphVM> _infoEdges = new ObservableCollection<EdgeGraphVM>();
+        public ObservableCollection<EdgeGraphVM> InfoEdges
+        {
+            get { return _infoEdges; }
+            set
+            {
+                _infoEdges = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Button> _buttonEdge = new ObservableCollection<Button>();
+        public ObservableCollection<Button> ButtonEdge
+        {
+            get { return _buttonEdge; }
+            set
+            {
+                _buttonEdge = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Button> _buttonCloseEdge = new ObservableCollection<Button>();
+        public ObservableCollection<Button> ButtonCloseEdge
+        {
+            get { return _buttonCloseEdge; }
+            set
+            {
+                _buttonCloseEdge = value;
+                OnPropertyChanged();
+            }
+        }
+
         //куча флагов по блокировке кнопок и других элементов
         #region
         private bool _isEnableButtonFile = true;
@@ -233,6 +299,17 @@ namespace Alg_Lab_5.VM
                 OnPropertyChanged();
             }
         }
+        private bool _isEnableTypeEdges = false;
+        public bool IsEnableTypeEdges
+        {
+            get { return _isEnableTypeEdges; }
+            set
+            {
+                _isEnableTypeEdges = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         //флаги на то, какие кнопки были нажаты ранее
@@ -282,12 +359,18 @@ namespace Alg_Lab_5.VM
         public ICommand CreatingNodes => new CommandDelegate(param =>
         {
             if (!wasOpenGraph) return;
-            IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false;
+            IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingEdge = false;
             isCreatindNodesMood = true; IsEnableButtonCloseMood = true;
             Mood = Moods["Nodes"];
         });
 
         public ICommand CreateNode => new CommandDelegate(param =>
+        {
+            if (isCreatindNodesMood) DrawNode();
+            if (isCreatindEdgeMood) DrawEdge();
+        });
+
+        private void DrawNode()
         {
             Drawer drawer = new Drawer();
             if (!isCreatindNodesMood || !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY) || !drawer.CanDrawNearEdge(PanelX, PanelY)) return;
@@ -296,13 +379,12 @@ namespace Alg_Lab_5.VM
             graph.NodeGraphs.AddLast(node);
 
             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, countGraph.ToString());
-            
+
             AddElementsInSettingPanel(node.Id, countGraph.ToString());
 
             countGraph++;
             CountNode++;
-        });
-
+        }
 
         private void AddElementsInSettingPanel(int id, string name)
         {
@@ -337,12 +419,70 @@ namespace Alg_Lab_5.VM
             ButtonClose.Add(buto);
         }
 
+        private void DrawEdge()
+        {
+            switch (SelectedType)
+            {
+                case("Неориентированные"):
+                    if (IsHasWeight) { }
+                    else DrawBaseEdge();
+                    break;
+                case ("Ориентированные"):
+                    if(IsHasWeight) { }
+                    else { }
+                    break;
+            }
+        }
+
+        bool isFirst = true;
+        bool isLine = false;
+        double X1 = 0;
+        double Y1 = 0;
+        double X2 = 0;
+        double Y2 = 0;
+        private void DrawBaseEdge()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawBaseLine(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge() { Type = TypeEdge.Base, FirstPosX = node1.PosX, FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX, SecondPosY = node2.PosY };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { FromTo = $"{node1.Name}->{node2.Name}"});
+                ButtonEdge.Add(new Button() {CommandParameter = edge.Id, Content = "Изменить" });
+                ButtonCloseEdge.Add(new Button() {CommandParameter = edge.Id, Content = "X", IsEnabled = false });
+                isLine = false;
+            }
+        }
+
+
         public ICommand CreatingEdges => new CommandDelegate(param =>
         {
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingNodes = false;
-            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true;
-            Mood = Moods["Nodes"];
+            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true;
+            Mood = Moods["Edges"];
         });
 
         //Right panel
@@ -357,7 +497,7 @@ namespace Alg_Lab_5.VM
                     nodeGraphVM.IsEnable = true;
                 }
             }
-            foreach(Button button in ButtonNode)
+            foreach (Button button in ButtonNode)
             {
                 if (button.CommandParameter.Equals((int)param))
                 {
@@ -365,7 +505,7 @@ namespace Alg_Lab_5.VM
                     button.Command = SaveSettingNode;
                 }
             }
-            foreach(Button button in ButtonClose) 
+            foreach (Button button in ButtonClose)
             {
                 if (button.CommandParameter.Equals((int)param))
                 {
@@ -488,9 +628,16 @@ namespace Alg_Lab_5.VM
         {
             if(isCreatindNodesMood)
             {
-                IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true;
+                IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingEdge = true;
                 isCreatindNodesMood = false;
                 IsEnableButtonCloseMood = false;
+                Mood = Moods["Standart"];
+            }
+            if(isCreatindEdgeMood)
+            {
+                IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingNodes = true;
+                isCreatindEdgeMood = false; 
+                IsEnableButtonCloseMood = false; IsEnableTypeEdges = false;
                 Mood = Moods["Standart"];
             }
         });

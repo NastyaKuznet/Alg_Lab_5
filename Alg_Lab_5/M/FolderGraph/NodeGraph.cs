@@ -14,7 +14,7 @@ namespace Alg_Lab_5.M.FolderGraph
         public double PosX { get; set; }
         public double PosY { get; set; }
 
-        
+        public List<Edge> Edges { get; set; } = new List<Edge>();
 
         public NodeGraph(string name, double posX, double posY)
         {

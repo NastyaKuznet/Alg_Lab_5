@@ -7,7 +7,7 @@
         xmlns:mouse="clr-namespace:Alg_Lab_5.VM"
         xmlns:local="clr-namespace:Alg_Lab_5.VM" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="850">
     <Window.DataContext>
         <local:MainVM/>
     </Window.DataContext>
@@ -52,6 +52,10 @@
                 <MenuItem Header="Обновить" Height="25" Command="{Binding Update}" IsEnabled="{Binding IsEnableButtonUpdate}"/>
                 <MenuItem Header="Закрыть режим" Command="{Binding CloseMood}" IsEnabled="{Binding IsEnableButtonCloseMood}"/>
                 <MenuItem Header="Сохранить граф" Command="{Binding SaveGraph}" IsEnabled="{Binding IsEnableButtonSaveGraph}"/>
+                <MenuItem Header="Виды ребер:" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <ComboBox ItemsSource="{Binding TypeEdges}" SelectedItem="{Binding SelectedType}" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <MenuItem Header="Вес" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <CheckBox IsEnabled="{Binding IsEnableTypeEdges}" IsChecked="{Binding IsHasWeight}"/>
             </Menu>
             <ScrollViewer  Grid.Column="2" Grid.Row="0">
                 <StackPanel CanVerticallyScroll="True">
@@ -85,11 +89,46 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Grid>
+                    <TextBlock Text="Ребра:"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="25"/>
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InfoEdges}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Path=FromTo}" Height="20" IsEnabled="{Binding Path=IsEnableFromTo}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding InfoEdges}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Path=Weight}" Height="20" IsEnabled="{Binding Path=IsEnableWeight}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="2" ItemsSource="{Binding ButtonEdge}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="3" ItemsSource="{Binding ButtonCloseEdge}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
                     <TextBlock Text="Матрица смежности графа"/>
                     <DataGrid ItemsSource="{Binding MatrixGraph}"/>
                     <Button Content="Обновить матрицу" Command="{Binding UpdateMatrix}"/>
-                    <!--<TextBlock Text="{Binding PanelX, StringFormat='X={0}'}" />
-                <TextBlock Text="{Binding PanelY, StringFormat='y={0}'}" />-->
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>
