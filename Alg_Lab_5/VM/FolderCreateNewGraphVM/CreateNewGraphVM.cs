@@ -71,6 +71,8 @@ namespace Alg_Lab_5.VM.FolderCreateNewGraphVM
             }
         }
 
+        public bool wasFinal = false;
+
         public CreateNewGraphVM()
         {
             AddDataContext();
@@ -117,6 +119,7 @@ namespace Alg_Lab_5.VM.FolderCreateNewGraphVM
                 Directory.CreateDirectory(PathFolder);
                 createGraphW.Close();
                 CanNext = false;
+                wasFinal = true;
             }
             if (CanNext)
             {
