@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Alg_Lab_5.M.FolderGraph;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,9 +33,22 @@ namespace Alg_Lab_5.M
             canvas.Children.Add(textBlock);
         }
 
-        public bool CanDrawEllipsWithoutOverlay(double posX, double posY)
+        public bool CanDrawEllipsWithoutOverlay(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
         {
-            return false; 
+            foreach(NodeGraph node in nodesGraph) 
+            {
+                double radius = Math.Sqrt(Math.Pow(posX - node.PosX, 2) + Math.Pow(posY - node.PosY,2));
+                if(radius < SizeNodeGraph)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool CanDrawNearEdge(double posX, double posY)
+        {
+            return posX > SizeNodeGraph / 2 && posY > SizeNodeGraph / 2;
         }
     }
 }

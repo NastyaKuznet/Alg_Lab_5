@@ -8,15 +8,21 @@ namespace Alg_Lab_5.M.FolderGraph
 {
     public class NodeGraph
     {
+        static int countId = 0;
+        public int Id { get; set; }
         public string Name { get; set; }
         public double PosX { get; set; }
         public double PosY { get; set; }
 
+        
+
         public NodeGraph(string name, double posX, double posY)
         {
+            Id = countId;
             Name = name;
             PosX = posX;
             PosY = posY;
+            countId++;
         }
     }
 }

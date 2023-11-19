@@ -8,11 +8,12 @@ namespace Alg_Lab_5.M.FolderGraph
 {
     public class Graph
     {
-        public List<NodeGraph> NodeGraphs { get; set; } 
+        public string Name { get; set; }
+        public LinkedList<NodeGraph> NodeGraphs { get; set; } 
 
         public Graph() 
         {
-            NodeGraphs = new List<NodeGraph>();
+            NodeGraphs = new LinkedList<NodeGraph>();
         }
     }
 }
