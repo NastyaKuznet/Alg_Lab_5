@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Alg_Lab_5.VM"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:mouse="clr-namespace:Alg_Lab_5.VM"
+        xmlns:local="clr-namespace:Alg_Lab_5.VM" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="850">
     <Window.DataContext>
         <local:MainVM/>
     </Window.DataContext>
@@ -15,28 +17,121 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            <MenuItem Header="Файл" Height="25">
-                <MenuItem Header="Создать новый граф" Command="{Binding CreateNewGraph}"/>
-                <MenuItem Header="Открыть граф" Command="{Binding OpenGraph}"/>
+            <MenuItem Header="Файл" Height="25" IsEnabled="{Binding IsEnableButtonFile}">
+                <MenuItem Header="Создать новый граф" Command="{Binding CreateNewGraph}" IsEnabled="{Binding IsEnableButtonCreateNewGraph}"/>
+                <MenuItem Header="Открыть граф" Command="{Binding OpenGraph}" IsEnabled="{Binding IsEnableButtonOpenGraph}"/>
+            </MenuItem>
+            <MenuItem Header="Режимы" IsEnabled="{Binding IsEnableButtonMood}">
+                <MenuItem Header="Создание узлов" Command="{Binding CreatingNodes}" IsEnabled="{Binding IsEnableButtonCreatingNodes}"/>
+                <MenuItem Header="Создание ребер" Command="{Binding CreatingEdges}" IsEnabled="{Binding IsEnableButtonCreatingEdge}"/>
             </MenuItem>
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
-            <Canvas Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Canvas Grid.Column="1" Background="AliceBlue">
             </Canvas>
-            <StackPanel Grid.Column="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Название графа" Grid.Column="0"/>
-                    <TextBlock Text="{Binding NameGraph}" Grid.Column="1"/>
-                </Grid>
-            </StackPanel>
+            <Canvas Grid.Column="0" Grid.Row="0" Background="AliceBlue">
+                <ContentPresenter Content="{Binding MainCanvas}"/>
+                <Canvas.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding CreateNode}" CommandParameter=""/>
+                </Canvas.InputBindings>
+                <i:Interaction.Behaviors>
+                    <mouse:MouseBehaviour MouseX="{Binding PanelX, Mode=OneWayToSource}" MouseY="{Binding PanelY, Mode=OneWayToSource}" />
+                </i:Interaction.Behaviors>
+            </Canvas>
+            
+            <Menu Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Height="25">
+                <MenuItem Header="Обновить" Height="25" Command="{Binding Update}" IsEnabled="{Binding IsEnableButtonUpdate}"/>
+                <MenuItem Header="Закрыть режим" Command="{Binding CloseMood}" IsEnabled="{Binding IsEnableButtonCloseMood}"/>
+                <MenuItem Header="Сохранить граф" Command="{Binding SaveGraph}" IsEnabled="{Binding IsEnableButtonSaveGraph}"/>
+                <MenuItem Header="Виды ребер:" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <ComboBox ItemsSource="{Binding TypeEdges}" SelectedItem="{Binding SelectedType}" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <MenuItem Header="Вес" IsEnabled="{Binding IsEnableTypeEdges}"/>
+                <CheckBox IsEnabled="{Binding IsEnableTypeEdges}" IsChecked="{Binding IsHasWeight}"/>
+            </Menu>
+            <ScrollViewer  Grid.Column="2" Grid.Row="0">
+                <StackPanel CanVerticallyScroll="True">
+                    <TextBlock Text="{Binding NameGraph, StringFormat='Название графа: {0}'}"/>
+                    <TextBlock Text="{Binding CountNode, StringFormat='Узлы: {0}'}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="25"/>
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding NamesNode}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Path=Name}" Height="20" IsEnabled="{Binding Path=IsEnable}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding ButtonNode}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="2" ItemsSource="{Binding ButtonClose}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                    <TextBlock Text="Ребра:"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="25"/>
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InfoEdges}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Path=FromTo}" Height="20" IsEnabled="{Binding Path=IsEnableFromTo}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding InfoEdges}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Path=Weight}" Height="20" IsEnabled="{Binding Path=IsEnableWeight}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="2" ItemsSource="{Binding ButtonEdge}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl Grid.Column="3" ItemsSource="{Binding ButtonCloseEdge}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding Path=Command}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                    <TextBlock Text="Матрица смежности графа"/>
+                    <DataGrid ItemsSource="{Binding MatrixGraph}"/>
+                    <Button Content="Обновить матрицу" Command="{Binding UpdateMatrix}"/>
+                </StackPanel>
+            </ScrollViewer>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>
         </Grid>
     </Grid>
 </Window>
