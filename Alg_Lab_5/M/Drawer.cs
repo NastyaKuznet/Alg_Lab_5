@@ -51,7 +51,7 @@ namespace Alg_Lab_5.M
             return posX > SizeNodeGraph / 2 && posY > SizeNodeGraph / 2;
         }
 
-        public void DrawBaseLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas)
+        public void DrawBaseLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size)
         {
             Line edge = new Line
             {
@@ -59,7 +59,8 @@ namespace Alg_Lab_5.M
                 Y1 = firstPosY,
                 X2 = secondPosX,
                 Y2 = secondPosY,
-                Stroke = ColorForeGroundTextGraph
+                StrokeThickness = size,
+                Stroke = colorStroke
             };
             canvas.Children.Add(edge);
         }

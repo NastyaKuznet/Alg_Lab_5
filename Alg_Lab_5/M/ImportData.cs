@@ -14,6 +14,7 @@ namespace Alg_Lab_5.M
         public static SolidColorBrush ColorFillNodeGraph = (SolidColorBrush)new BrushConverter().ConvertFrom("#B0E0E6");
         public static SolidColorBrush ColorStrokeNodeGraph = (SolidColorBrush)new BrushConverter().ConvertFrom("#5F9EA0");
         public static SolidColorBrush ColorForeGroundTextGraph = (SolidColorBrush)new BrushConverter().ConvertFrom("#000000");
+        public static SolidColorBrush ColorBackground = (SolidColorBrush)new BrushConverter().ConvertFrom("#f0f8ff");
         public static Dictionary<string, string> Moods = new Dictionary<string, string>() { { "Standart", "Стандартный" }, {"Nodes", "Редактирование узлов" }, { "Edges", "Редактирование ребер" } };
     }
 }
