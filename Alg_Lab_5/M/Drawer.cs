@@ -65,6 +65,31 @@ namespace Alg_Lab_5.M
             canvas.Children.Add(edge);
         }
 
+        public void DrawBaseLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, int weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill)
+        {
+            Line edge = new Line
+            {
+                X1 = firstPosX,
+                Y1 = firstPosY,
+                X2 = secondPosX,
+                Y2 = secondPosY,
+                StrokeThickness = size,
+                Stroke = colorStroke
+            };
+            canvas.Children.Add(edge);
+            Rectangle rectangle = new Rectangle {Width = weight.ToString().Length * 10, Height = 15 , Stroke = recColorStroke, Fill = recColorFill };
+            Canvas.SetBottom(rectangle, (-1) * (firstPosY - (firstPosY - secondPosY) / 2) - 5);
+            Canvas.SetLeft(rectangle, firstPosX - (firstPosX - secondPosX) / 2);
+            canvas.Children.Add(rectangle);
+            if (weight != -1)
+            {
+                TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+                Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+                Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+                canvas.Children.Add(textBlock);
+            }
+        }
+
         public NodeGraph FindNodeInTouch(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
         {
             foreach(NodeGraph node in nodesGraph)

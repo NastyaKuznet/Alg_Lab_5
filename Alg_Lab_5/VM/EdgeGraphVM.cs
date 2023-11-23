@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alg_Lab_5.VM
 {
-    public class EdgeGraphVM
+    public class EdgeGraphVM: BaseVM
     {
         public int Id { get; set; }
         public string FromTo { get; set; }
@@ -14,7 +14,15 @@ namespace Alg_Lab_5.VM
 
         public bool IsEnableFromTo { get; set; }
 
-        public bool IsEnableWeight { get; set; }
+        private bool _isEnableFromTo = false;
+
+        public bool IsEnableWeight 
+        {
+            get { return _isEnableFromTo; }
+            set { _isEnableFromTo = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool IsWeight { get; set; } = false;
        

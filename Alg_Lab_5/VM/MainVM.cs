@@ -357,6 +357,8 @@ namespace Alg_Lab_5.VM
 
                             NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                             NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
                             InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}" });
                             ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
                             ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
@@ -405,7 +407,7 @@ namespace Alg_Lab_5.VM
         private void AddElementsInSettingPanel(int id, string name)
         {
             AddNamesNodes(id, name); 
-            AddButtonNodes(id ); 
+            AddButtonNodes(id); 
             AddButtonCancelNodes(id);
         }
 
@@ -440,7 +442,7 @@ namespace Alg_Lab_5.VM
             switch (SelectedType)
             {
                 case("Неориентированные"):
-                    if (IsHasWeight) { }
+                    if (IsHasWeight) DrawBaseEdgeWeigh();
                     else DrawBaseEdge();
                     break;
                 case ("Ориентированные"):
@@ -463,6 +465,8 @@ namespace Alg_Lab_5.VM
             {
                 X1 = PanelX;
                 Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 isFirst = false;
             }
             else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
@@ -488,6 +492,51 @@ namespace Alg_Lab_5.VM
                 InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}"});
                 ButtonEdge.Add(new Button() {CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
                 ButtonCloseEdge.Add(new Button() {CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges});
+                isLine = false;
+            }
+        }
+        
+        private void DrawBaseEdgeWeigh()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawBaseLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, 1, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge()
+                {
+                    Type = TypeEdge.Base,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY,
+                    Weight = 1
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsWeight = true, Weight = 1 });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
                 isLine = false;
             }
         }
@@ -678,6 +727,12 @@ namespace Alg_Lab_5.VM
                     {
                         edge.Weight = weigh;
                         canbreak = true;
+                        Drawer drawer = new Drawer();
+                        NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                        NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                        drawer.DrawBaseLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, weigh, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
                         break;
                     }
                 }
@@ -715,7 +770,14 @@ namespace Alg_Lab_5.VM
                         remov = edge;
                         canbreak = true;
                         Drawer drawer = new Drawer();
-                        drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                        if (edge.Weight == 0)
+                        {
+                            drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                        }
+                        else
+                        {
+                            drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
+                        }
                         NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                         NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                         drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
@@ -771,7 +833,7 @@ namespace Alg_Lab_5.VM
                 graph = new Graph();
                 graph.Name = NameGraph;
                 wasOpenGraph = true;
-                IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
             }
             IsEnableButtonUpdate = false;
         });
