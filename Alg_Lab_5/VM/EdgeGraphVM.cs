@@ -11,7 +11,7 @@ namespace Alg_Lab_5.VM
         public int Id { get; set; }
         public string FromTo { get; set; }
         public int Weight { get; set; }
-
+        public bool IsDirected { get; set; } = false;
         public bool IsEnableFromTo { get; set; }
 
         private bool _isEnableFromTo = false;

@@ -353,7 +353,22 @@ namespace Alg_Lab_5.VM
                         if (!unikIdEdge.Contains(edge.Id))
                         {
                             unikIdEdge.Add(edge.Id);
-                            drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                            if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Base))
+                            {
+                                drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                            }
+                            else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Base))
+                            {
+                                drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                            }
+                            else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            {
+                                drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                            }
+                            else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            {
+                                drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                            }
 
                             NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                             NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
@@ -365,8 +380,11 @@ namespace Alg_Lab_5.VM
                         }
                     }
                     drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node.PosX, node.PosY, MainCanvas, node.Name);
-                    AddElementsInSettingPanel(node.Id, node.Name);
-                    
+
+                    NamesNode.Add(new NodeGraphVM(node.Id) { Name = countGraph.ToString(), IsEnable = false });
+                    ButtonNode.Add(new Button { Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
+                    ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
+
                 }
 
                 IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
@@ -398,43 +416,12 @@ namespace Alg_Lab_5.VM
 
             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, countGraph.ToString());
 
-            AddElementsInSettingPanel(node.Id, countGraph.ToString());
+            NamesNode.Add(new NodeGraphVM(node.Id) { Name = countGraph.ToString(), IsEnable = false });
+            ButtonNode.Add(new Button {Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
+            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
 
             countGraph++;
             CountNode++;
-        }
-
-        private void AddElementsInSettingPanel(int id, string name)
-        {
-            AddNamesNodes(id, name); 
-            AddButtonNodes(id); 
-            AddButtonCancelNodes(id);
-        }
-
-        private void AddNamesNodes(int id, string name)
-        {
-            NodeGraphVM nodeGrapgVM = new NodeGraphVM(id);
-            nodeGrapgVM.Name = name;
-            nodeGrapgVM.IsEnable = false;
-            NamesNode.Add(nodeGrapgVM);
-        }
-
-        private void AddButtonNodes(int id)
-        {
-            Button but = new Button();
-            but.Content = "Изменить";
-            but.CommandParameter = id;
-            but.Command = ChangeSetting;
-            ButtonNode.Add(but);
-        }
-        private void AddButtonCancelNodes(int id)
-        {
-            Button buto = new Button();
-            buto.Content = "X";
-            buto.CommandParameter = id;
-            buto.IsEnabled = false;
-            buto.Command = DeleteNode;
-            ButtonClose.Add(buto);
         }
 
         private void DrawEdge()
@@ -446,8 +433,8 @@ namespace Alg_Lab_5.VM
                     else DrawBaseEdge();
                     break;
                 case ("Ориентированные"):
-                    if(IsHasWeight) { }
-                    else { }
+                    if (IsHasWeight) DrawDirectedEdgeWeihg();
+                    else DrawDirectedEdge(); 
                     break;
             }
         }
@@ -541,6 +528,95 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private void DrawDirectedEdge()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawDirectedLine(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge()
+                {
+                    Type = TypeEdge.Directed,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = true });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
+                isLine = false;
+            }
+        }
+
+        private void DrawDirectedEdgeWeihg()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawDirectedLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, 1, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge()
+                {
+                    Type = TypeEdge.Directed,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY,
+                    Weight = 1
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = true, IsWeight = true, Weight = 1 });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
+                isLine = false;
+            }
+        }
+
         public ICommand CreatingEdges => new CommandDelegate(param =>
         {
             if (!wasOpenGraph) return;
@@ -627,7 +703,7 @@ namespace Alg_Lab_5.VM
                 {
                     LinkedListNode<NodeGraph> del = currentNode;
                     Drawer drawer = new Drawer();
-                    drawer.DrawEllipsWithName(SizeNodeGraph + 1, SizeNodeGraph + 1, ColorFillNodeGraph, ColorFillNodeGraph, currentNode.Value.PosX, currentNode.Value.PosY, MainCanvas, "");
+                    drawer.DrawEllipsWithName(SizeNodeGraph + 1, SizeNodeGraph + 1, ColorBackground, ColorBackground, currentNode.Value.PosX, currentNode.Value.PosY, MainCanvas, "");
                     currentNode = currentNode.Next;
                     graph.NodeGraphs.Remove(del);
                     continue;
@@ -770,16 +846,28 @@ namespace Alg_Lab_5.VM
                         remov = edge;
                         canbreak = true;
                         Drawer drawer = new Drawer();
-                        if (edge.Weight == 0)
+                        NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                        NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                        if (edge.Weight == 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
                             drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
                         }
-                        else
+                        else if (edge.Weight != 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
                             drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
                         }
-                        NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
-                        NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                        else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                            foreach(Edge edge1 in node1.Edges)
+                            {
+                                if(node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawDirectedLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                                }
+                            }
+                        }
+                        
                         drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                         drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
                         break;
