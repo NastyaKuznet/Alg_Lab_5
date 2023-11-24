@@ -25,6 +25,7 @@
                 <MenuItem Header="Создание узлов" Command="{Binding CreatingNodes}" IsEnabled="{Binding IsEnableButtonCreatingNodes}"/>
                 <MenuItem Header="Создание ребер" Command="{Binding CreatingEdges}" IsEnabled="{Binding IsEnableButtonCreatingEdge}"/>
             </MenuItem>
+            <MenuItem Header="Помощь" Command="{Binding OpenHelp}"/>
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

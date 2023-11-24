@@ -19,7 +19,9 @@ using System.Xml.Linq;
 using Alg_Lab_5.M;
 using Alg_Lab_5.M.FolderGraph;
 using Alg_Lab_5.V.FolderCreateNewGraph;
+using Alg_Lab_5.V.FolderHelpWindow;
 using Alg_Lab_5.VM.FolderCreateNewGraphVM;
+using Alg_Lab_5.VM.FolderHelpVM;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using static Alg_Lab_5.M.ImportData;
 
@@ -29,6 +31,8 @@ namespace Alg_Lab_5.VM
     {
         CreateNewGraphW cUW = new CreateNewGraphW();
         CreateNewGraphVM cVM = new CreateNewGraphVM();
+        HelpW helpW = new HelpW();
+        HelpVM helpVM = new HelpVM();
 
         DialogeOpen dialoge = new DialogeOpen();
         string pathFolder = null;
@@ -672,6 +676,13 @@ namespace Alg_Lab_5.VM
             isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true;
             if (wasChoiceTypeEdgesGraph) IsEnableTypeEdges = false;
             Mood = Moods["Edges"];
+        });
+
+        //Help
+        public ICommand OpenHelp => new CommandDelegate(param =>
+        {
+            helpW.DataContext = helpVM;
+            helpW.Show();
         });
 
         //Right panel
