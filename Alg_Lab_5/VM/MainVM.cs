@@ -32,8 +32,8 @@ namespace Alg_Lab_5.VM
 
         DialogeOpen dialoge = new DialogeOpen();
         string pathFolder = null;
-        int countGraph = 0;
         Graph graph;
+        int idEdge = 0;
 
         private string _nameGraph = "";
         public string NameGraph
@@ -319,6 +319,7 @@ namespace Alg_Lab_5.VM
         bool wasOpenGraph = false;
         bool isCreatindNodesMood = false;
         bool isCreatindEdgeMood = false;
+        bool wasChoiceTypeEdgesGraph = false;
         #endregion
         public MainVM()
         {
@@ -370,12 +371,13 @@ namespace Alg_Lab_5.VM
                             {
                                 drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                             }
+                            if(idEdge < edge.Id) idEdge = edge.Id;
 
                             NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                             NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
-                            InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}" });
+                            InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = edge.Type.Equals(TypeEdge.Directed), IsWeight = edge.Weight != 0});
                             ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
                             ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
                         }
@@ -388,7 +390,16 @@ namespace Alg_Lab_5.VM
 
                 }
                 CountNode = graph.NodeGraphs.Count;
-                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableTypeEdges = false;
+                wasChoiceTypeEdgesGraph = InfoEdges.Count != 0;
+                if(wasChoiceTypeEdgesGraph)
+                {
+                    if (InfoEdges[0].IsDirected)
+                        SelectedType = "Ориентированные";
+                    else SelectedType = "Неориентированные";
+                    IsHasWeight = InfoEdges[0].IsWeight;
+                }
+                idEdge++;
             }
         });
 
@@ -412,21 +423,26 @@ namespace Alg_Lab_5.VM
             Drawer drawer = new Drawer();
             if (!isCreatindNodesMood || !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY) || !drawer.CanDrawNearEdge(PanelX, PanelY)) return;
 
-            NodeGraph node = new NodeGraph(countGraph.ToString(), PanelX, PanelY);
+            NodeGraph node = new NodeGraph(CountNode,CountNode.ToString(), PanelX, PanelY);
             graph.NodeGraphs.AddLast(node);
 
-            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, countGraph.ToString());
+            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, CountNode.ToString());
 
-            NamesNode.Add(new NodeGraphVM(node.Id) { Name = countGraph.ToString(), IsEnable = false });
+            NamesNode.Add(new NodeGraphVM(node.Id) { Name = CountNode.ToString(), IsEnable = false });
             ButtonNode.Add(new Button {Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
             ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
 
-            countGraph++;
             CountNode++;
         }
 
         private void DrawEdge()
         {
+            wasChoiceTypeEdgesGraph = true;
+            if (wasChoiceTypeEdgesGraph)
+            {
+                IsEnableTypeEdges = false;
+            }
+
             switch (SelectedType)
             {
                 case("Неориентированные"):
@@ -472,7 +488,7 @@ namespace Alg_Lab_5.VM
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
 
-                Edge edge = new Edge() { Type = TypeEdge.Base, FirstPosX = node1.PosX, FirstPosY = node1.PosY,
+                Edge edge = new Edge(idEdge++) { Type = TypeEdge.Base, FirstPosX = node1.PosX, FirstPosY = node1.PosY,
                     SecondPosX = node2.PosX, SecondPosY = node2.PosY };
                 node1.Edges.Add(edge);
                 node2.Edges.Add(edge);
@@ -510,7 +526,7 @@ namespace Alg_Lab_5.VM
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
 
-                Edge edge = new Edge()
+                Edge edge = new Edge(idEdge++)
                 {
                     Type = TypeEdge.Base,
                     FirstPosX = node1.PosX,
@@ -555,7 +571,7 @@ namespace Alg_Lab_5.VM
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
 
-                Edge edge = new Edge()
+                Edge edge = new Edge(idEdge++)
                 {
                     Type = TypeEdge.Directed,
                     FirstPosX = node1.PosX,
@@ -599,7 +615,7 @@ namespace Alg_Lab_5.VM
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
 
-                Edge edge = new Edge()
+                Edge edge = new Edge(idEdge++)
                 {
                     Type = TypeEdge.Directed,
                     FirstPosX = node1.PosX,
@@ -623,6 +639,7 @@ namespace Alg_Lab_5.VM
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingNodes = false;
             isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true;
+            if (wasChoiceTypeEdgesGraph) IsEnableTypeEdges = false;
             Mood = Moods["Edges"];
         });
 
@@ -847,11 +864,16 @@ namespace Alg_Lab_5.VM
         public ICommand DeleteEdges => new CommandDelegate(param =>
         {
             DeleteEdgeM(param);
+            if(InfoEdges.Count == 0)
+            {
+                wasChoiceTypeEdgesGraph = false;
+                IsEnableTypeEdges = true;
+            }
         });
 
         private void DeleteEdgeM(object param)
         {
-            Edge remov = new Edge();
+            Edge remov = new Edge(-1);
             bool canbreak = false;
             foreach (NodeGraph node in graph.NodeGraphs)
             {
