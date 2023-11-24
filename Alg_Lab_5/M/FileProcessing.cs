@@ -1,6 +1,7 @@
 ﻿using Alg_Lab_5.M.FolderGraph;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,28 @@ namespace Alg_Lab_5.M
                 }
             }
             return graph;
+        }
+
+        public void SaveMatrix(string pathFolder, DataTable dataTable)
+        {
+            StringBuilder contentFile = new StringBuilder();
+            StringBuilder str = new StringBuilder();
+            foreach(DataColumn column in dataTable.Columns)
+            {
+                str.Append(column.ColumnName + ";");
+            }
+            contentFile.AppendLine(str.ToString());
+            str.Clear();
+            foreach(DataRow row in dataTable.Rows) 
+            {
+                for(int i = 0; i < row.ItemArray.Length; i++)
+                {
+                    str.Append(row[i].ToString() + ";");
+                }
+                contentFile.AppendLine(str.ToString());
+                str.Clear();
+            }
+            File.WriteAllText(pathFolder + "\\MatrixAdjacency.csv", contentFile.ToString());
         }
     }
 }

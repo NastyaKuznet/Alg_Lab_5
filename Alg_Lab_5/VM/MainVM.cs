@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -381,12 +382,12 @@ namespace Alg_Lab_5.VM
                     }
                     drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node.PosX, node.PosY, MainCanvas, node.Name);
 
-                    NamesNode.Add(new NodeGraphVM(node.Id) { Name = countGraph.ToString(), IsEnable = false });
+                    NamesNode.Add(new NodeGraphVM(node.Id) { Name = node.Name, IsEnable = false });
                     ButtonNode.Add(new Button { Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
                     ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
 
                 }
-
+                CountNode = graph.NodeGraphs.Count;
                 IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
             }
         });
@@ -703,6 +704,16 @@ namespace Alg_Lab_5.VM
                 {
                     LinkedListNode<NodeGraph> del = currentNode;
                     Drawer drawer = new Drawer();
+                    
+                    List<object> ids = new List<object>();
+                    foreach(Edge edge in currentNode.Value.Edges)
+                    {
+                        ids.Add(edge.Id);   
+                    }
+                    foreach(object id in ids)
+                    {
+                        DeleteEdgeM(id);
+                    }
                     drawer.DrawEllipsWithName(SizeNodeGraph + 1, SizeNodeGraph + 1, ColorBackground, ColorBackground, currentNode.Value.PosX, currentNode.Value.PosY, MainCanvas, "");
                     currentNode = currentNode.Next;
                     graph.NodeGraphs.Remove(del);
@@ -835,6 +846,11 @@ namespace Alg_Lab_5.VM
 
         public ICommand DeleteEdges => new CommandDelegate(param =>
         {
+            DeleteEdgeM(param);
+        });
+
+        private void DeleteEdgeM(object param)
+        {
             Edge remov = new Edge();
             bool canbreak = false;
             foreach (NodeGraph node in graph.NodeGraphs)
@@ -856,24 +872,24 @@ namespace Alg_Lab_5.VM
                         {
                             drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
                         }
-                        else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                        else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
                         {
                             drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
-                            foreach(Edge edge1 in node1.Edges)
+                            foreach (Edge edge1 in node1.Edges)
                             {
-                                if(node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
                                 {
                                     drawer.DrawDirectedLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
                                 }
                             }
                         }
-                        
+
                         drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                         drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
                         break;
                     }
                 }
-                if (canbreak) 
+                if (canbreak)
                 {
                     node.Edges.Remove(remov);
                     break;
@@ -908,7 +924,7 @@ namespace Alg_Lab_5.VM
                 }
             }
             ButtonCloseEdge.Remove(remo);
-        });
+        }
 
         //Down panel
         public ICommand Update => new CommandDelegate(param =>
@@ -946,7 +962,9 @@ namespace Alg_Lab_5.VM
 
         public ICommand SaveGraph => new CommandDelegate(param =>
         {
-            new FileProcessing().SaveGraph(pathFolder, graph);
+            FileProcessing fileProcessing = new FileProcessing();
+            fileProcessing.SaveGraph(pathFolder, graph);
+            fileProcessing.SaveMatrix(pathFolder, new WorkerMatrix().CreateMatrix(graph.NodeGraphs));
         });
     }
 }
