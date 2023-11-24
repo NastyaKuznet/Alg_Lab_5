@@ -338,6 +338,7 @@ namespace Alg_Lab_5.VM
 
         public ICommand OpenGraph => new CommandDelegate(param =>
         {
+            ClearAll();
             pathFolder = dialoge.CallFolderBrowserDialog();
             wasOpenGraph = !string.IsNullOrEmpty(pathFolder);
             if (wasOpenGraph)
@@ -402,6 +403,36 @@ namespace Alg_Lab_5.VM
                 idEdge++;
             }
         });
+
+        private void ClearAll()
+        {
+            pathFolder = null;
+            graph = null;
+            idEdge = 0;
+            NameGraph = "";
+            CountNode = 0;
+            MainCanvas = new Canvas();
+            Mood = "Стандартный";
+            NamesNode = new ObservableCollection<NodeGraphVM>();
+            ButtonNode = new ObservableCollection<Button>();
+            ButtonClose = new ObservableCollection<Button>();
+            MatrixGraph = new DataTable();
+            SelectedType = "Неориентированные";
+            IsHasWeight = false;
+            InfoEdges = new ObservableCollection<EdgeGraphVM>();
+            ButtonEdge = new ObservableCollection<Button>();
+            ButtonCloseEdge = new ObservableCollection<Button>();
+            IsEnableButtonFile = true;
+            IsEnableButtonCreateNewGraph = true;
+            IsEnableButtonOpenGraph = true;
+            IsEnableButtonMood = true;
+            IsEnableButtonCreatingNodes = true;
+            IsEnableButtonUpdate = false;
+            IsEnableButtonCloseMood = false;
+            IsEnableButtonSaveGraph = true;
+            IsEnableButtonCreatingEdge = true;
+            IsEnableTypeEdges = false;
+        }
 
         //Mode
         public ICommand CreatingNodes => new CommandDelegate(param =>
