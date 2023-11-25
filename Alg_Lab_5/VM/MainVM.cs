@@ -27,7 +27,7 @@ using static Alg_Lab_5.M.ImportData;
 
 namespace Alg_Lab_5.VM
 {
-    public class MainVM: BaseVM
+    public class MainVM : BaseVM
     {
         CreateNewGraphW cUW = new CreateNewGraphW();
         CreateNewGraphVM cVM = new CreateNewGraphVM();
@@ -62,7 +62,7 @@ namespace Alg_Lab_5.VM
 
         private Canvas _mainCanvas = new Canvas();
         public Canvas MainCanvas
-        { 
+        {
             get { return _mainCanvas; }
             set {
                 _mainCanvas = value;
@@ -135,7 +135,7 @@ namespace Alg_Lab_5.VM
         }
 
         private DataTable _matrixGraph = new DataTable();
-        public DataTable MatrixGraph 
+        public DataTable MatrixGraph
         {
             get { return _matrixGraph; }
             set
@@ -145,7 +145,7 @@ namespace Alg_Lab_5.VM
             }
         }
 
-        private ObservableCollection<string> _typeEdges = new ObservableCollection<string> { "Неориентированные", "Ориентированные"};
+        private ObservableCollection<string> _typeEdges = new ObservableCollection<string> { "Неориентированные", "Ориентированные" };
         public ObservableCollection<string> TypeEdges
         {
             get { return _typeEdges; }
@@ -209,6 +209,20 @@ namespace Alg_Lab_5.VM
                 _buttonCloseEdge = value;
                 OnPropertyChanged();
             }
+        }
+
+        private string[] _nameAlgorithms = {"Обход взвешенного графа в ширину", "Обход взвешенного графа в глубину", "Поиск максимального потока через транспортную сеть", "Построение минимального остовного дерева", "Поиск кратчайшего пути между двумя вершинами графа" };
+        public string[] NameAlgorithms
+        {
+            get { return _nameAlgorithms; }
+            set { _nameAlgorithms= value; OnPropertyChanged(); }
+        }
+
+        private string _selectedNameAlgorithm = "";
+        public string SelectedNameAlgorithm
+        {
+            get { return _selectedNameAlgorithm; }
+            set { _selectedNameAlgorithm = value; OnPropertyChanged(); }
         }
 
         //куча флагов по блокировке кнопок и других элементов
@@ -315,6 +329,14 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private bool _isEnableNamesAlgorithm = false;
+        public bool IsEnableNamesAlgorithm
+        {
+            get { return _isEnableNamesAlgorithm;}
+            set { _isEnableNamesAlgorithm = value; OnPropertyChanged(); }
+        }
+
+
         #endregion
 
         //флаги на то, какие кнопки были нажаты ранее
@@ -395,7 +417,7 @@ namespace Alg_Lab_5.VM
 
                 }
                 CountNode = graph.NodeGraphs.Count;
-                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableTypeEdges = false;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableTypeEdges = false; IsEnableNamesAlgorithm = true;
                 wasChoiceTypeEdgesGraph = InfoEdges.Count != 0;
                 if(wasChoiceTypeEdgesGraph)
                 {
@@ -443,7 +465,7 @@ namespace Alg_Lab_5.VM
         {
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingEdge = false;
-            isCreatindNodesMood = true; IsEnableButtonCloseMood = true;
+            isCreatindNodesMood = true; IsEnableButtonCloseMood = true; IsEnableNamesAlgorithm = false;
             Mood = Moods["Nodes"];
         });
 
@@ -673,7 +695,7 @@ namespace Alg_Lab_5.VM
         {
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingNodes = false;
-            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true;
+            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true; IsEnableNamesAlgorithm = false;
             if (wasChoiceTypeEdgesGraph) IsEnableTypeEdges = false;
             Mood = Moods["Edges"];
         });
@@ -990,6 +1012,11 @@ namespace Alg_Lab_5.VM
             ButtonCloseEdge.Remove(remo);
         }
 
+        public ICommand StartAlgorithm => new CommandDelegate(param =>
+        {
+            AlgorithmLauncher algorithmLauncher = new AlgorithmLauncher(SelectedNameAlgorithm);   
+        });
+
         //Down panel
         public ICommand Update => new CommandDelegate(param =>
         {
@@ -1001,7 +1028,7 @@ namespace Alg_Lab_5.VM
                 graph = new Graph();
                 graph.Name = NameGraph;
                 wasOpenGraph = true;
-                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableNamesAlgorithm = true;
             }
             IsEnableButtonUpdate = false;
         });
@@ -1011,14 +1038,14 @@ namespace Alg_Lab_5.VM
             if(isCreatindNodesMood)
             {
                 IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingEdge = true;
-                isCreatindNodesMood = false;
+                isCreatindNodesMood = false; IsEnableNamesAlgorithm = true;
                 IsEnableButtonCloseMood = false;
                 Mood = Moods["Standart"];
             }
             if(isCreatindEdgeMood)
             {
                 IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingNodes = true;
-                isCreatindEdgeMood = false; 
+                isCreatindEdgeMood = false; IsEnableNamesAlgorithm = true;
                 IsEnableButtonCloseMood = false; IsEnableTypeEdges = false;
                 Mood = Moods["Standart"];
             }
