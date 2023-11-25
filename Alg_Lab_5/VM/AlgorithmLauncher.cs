@@ -1,58 +1,42 @@
-﻿using System;
+﻿using Alg_Lab_5.M.Algorithms;
+using Alg_Lab_5.M.FolderGraph;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Alg_Lab_5.VM
 {
     public class AlgorithmLauncher
     {
-        public AlgorithmLauncher(string nameAlgorithm)
-        {
-            switch (nameAlgorithm)
-            {
-                case ("Обход взвешенного графа в ширину"):
-                    BypassWeightedGraphInWidth();
-                    break;
-                case ("Обход взвешенного графа в глубину"):
-                    BypassWeightedGraphInDepth();
-                    break;
-                case ("Поиск максимального потока через транспортную сеть"):
-                    FindMaxThreadAcrossTrasportNet();
-                    break;
-                case ("Построение минимального остовного дерева"):
-                    BuildMinSpanningTree();
-                    break;
-                case ("Поиск кратчайшего пути между двумя вершинами графа"):
-                    FindMinPathBetweenTwoNodes();
-                    break;
-            }
-        }
-
-        private void BypassWeightedGraphInWidth()
+        public void BypassWeightedGraphInWidth()
         {
 
         }
 
-        private void BypassWeightedGraphInDepth() 
+        public void BypassWeightedGraphInDepth() 
         {
         
         }
 
-        private void FindMaxThreadAcrossTrasportNet()
+        public void FindMaxThreadAcrossTrasportNet()
         {
 
         }
 
-        private void BuildMinSpanningTree()
+        public void BuildMinSpanningTree()
         {
 
         }
 
-        private void FindMinPathBetweenTwoNodes()
+        public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode)
         {
-            
+            Dextra dextra = new Dextra(graph, startNode, endNode);
+            int result = dextra.ResultWeight;
         }
     }
 }

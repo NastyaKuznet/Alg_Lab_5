@@ -18,8 +18,10 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using Alg_Lab_5.M;
 using Alg_Lab_5.M.FolderGraph;
+using Alg_Lab_5.V.FolderAlgorithms;
 using Alg_Lab_5.V.FolderCreateNewGraph;
 using Alg_Lab_5.V.FolderHelpWindow;
+using Alg_Lab_5.VM.FolderAlgorithmsVM;
 using Alg_Lab_5.VM.FolderCreateNewGraphVM;
 using Alg_Lab_5.VM.FolderHelpVM;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
@@ -33,6 +35,8 @@ namespace Alg_Lab_5.VM
         CreateNewGraphVM cVM = new CreateNewGraphVM();
         HelpW helpW = new HelpW();
         HelpVM helpVM = new HelpVM();
+        BaseDextraW bDW = new BaseDextraW();
+        BaseDextraVM bDVM;
 
         DialogeOpen dialoge = new DialogeOpen();
         string pathFolder = null;
@@ -224,6 +228,13 @@ namespace Alg_Lab_5.VM
             get { return _selectedNameAlgorithm; }
             set { _selectedNameAlgorithm = value; OnPropertyChanged(); }
         }
+        
+        private StackPanel _baseDataForAlgortithm = new StackPanel();
+        public StackPanel BaseDataForAlgortithm
+        {
+            get { return _baseDataForAlgortithm; }
+            set { _baseDataForAlgortithm = value; OnPropertyChanged(); }
+        }
 
         //куча флагов по блокировке кнопок и других элементов
         #region
@@ -336,6 +347,13 @@ namespace Alg_Lab_5.VM
             set { _isEnableNamesAlgorithm = value; OnPropertyChanged(); }
         }
 
+        private bool _isEnableButtonStartAlgorithm = false;
+        
+        public bool IsEnableButtonStartAlgorithm 
+        {
+            get { return _isEnableButtonStartAlgorithm; }
+            set { _isEnableButtonStartAlgorithm = value; OnPropertyChanged(); }
+        }
 
         #endregion
 
@@ -953,10 +971,24 @@ namespace Alg_Lab_5.VM
                         if (edge.Weight == 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
                             drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawBaseLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                                }
+                            }
                         }
                         else if (edge.Weight != 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
                             drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawBaseLineWeight(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge1.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph);
+                                }
+                            }
                         }
                         else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
                         {
@@ -966,6 +998,17 @@ namespace Alg_Lab_5.VM
                                 if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
                                 {
                                     drawer.DrawDirectedLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                                }
+                            }
+                        }
+                        else if(edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawDirectedLineWeight(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge1.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph ) ;
                                 }
                             }
                         }
@@ -1012,9 +1055,54 @@ namespace Alg_Lab_5.VM
             ButtonCloseEdge.Remove(remo);
         }
 
+        public ICommand StartBaseAlogorithm => new CommandDelegate(param =>
+        {
+            switch (SelectedNameAlgorithm)
+            {
+                case ("Обход взвешенного графа в ширину"):
+
+                    break;
+                case ("Обход взвешенного графа в глубину"):
+
+                    break;
+                case ("Поиск максимального потока через транспортную сеть"):
+
+                    break;
+                case ("Построение минимального остовного дерева"):
+
+                    break;
+                case ("Поиск кратчайшего пути между двумя вершинами графа"):
+                    bDVM = new BaseDextraVM(graph, bDW, this);
+                    bDW.DataContext = bDVM;
+                    bDW.ShowDialog();
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
+                    break;
+            }
+            
+        });
+
         public ICommand StartAlgorithm => new CommandDelegate(param =>
         {
-            AlgorithmLauncher algorithmLauncher = new AlgorithmLauncher(SelectedNameAlgorithm);   
+            AlgorithmLauncher algorithmLauncher = new AlgorithmLauncher();
+            switch(SelectedNameAlgorithm)
+            {
+                case ("Обход взвешенного графа в ширину"):
+                    algorithmLauncher.BypassWeightedGraphInWidth();
+                break;
+                case ("Обход взвешенного графа в глубину"):
+                    algorithmLauncher.BypassWeightedGraphInDepth();
+                break;
+                case ("Поиск максимального потока через транспортную сеть"):
+                    algorithmLauncher.FindMaxThreadAcrossTrasportNet();
+                break;
+                case ("Построение минимального остовного дерева"):
+                    algorithmLauncher.BuildMinSpanningTree();
+                break;
+                case ("Поиск кратчайшего пути между двумя вершинами графа"):
+                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
+                break;
+            }
         });
 
         //Down panel
