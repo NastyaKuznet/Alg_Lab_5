@@ -25,6 +25,7 @@
                 <MenuItem Header="Создание узлов" Command="{Binding CreatingNodes}" IsEnabled="{Binding IsEnableButtonCreatingNodes}"/>
                 <MenuItem Header="Создание ребер" Command="{Binding CreatingEdges}" IsEnabled="{Binding IsEnableButtonCreatingEdge}"/>
             </MenuItem>
+            <MenuItem Header="Помощь" Command="{Binding OpenHelp}"/>
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -129,6 +130,15 @@
                     <TextBlock Text="Матрица смежности графа"/>
                     <DataGrid ItemsSource="{Binding MatrixGraph}"/>
                     <Button Content="Обновить матрицу" Command="{Binding UpdateMatrix}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Алгоритмы:"/>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding NameAlgorithms}" SelectedItem="{Binding SelectedNameAlgorithm}" IsEnabled="{Binding IsEnableNamesAlgorithm}"/>
+                    </Grid>
+                    <Button Content="Запустить алгоритм" Command="{Binding StartAlgorithm}"/>
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>

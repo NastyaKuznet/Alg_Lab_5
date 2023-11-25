@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using static Alg_Lab_5.M.ImportData;
 
@@ -51,7 +52,7 @@ namespace Alg_Lab_5.M
             return posX > SizeNodeGraph / 2 && posY > SizeNodeGraph / 2;
         }
 
-        public void DrawBaseLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas)
+        public void DrawBaseLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size)
         {
             Line edge = new Line
             {
@@ -59,9 +60,86 @@ namespace Alg_Lab_5.M
                 Y1 = firstPosY,
                 X2 = secondPosX,
                 Y2 = secondPosY,
-                Stroke = ColorForeGroundTextGraph
+                StrokeThickness = size,
+                Stroke = colorStroke
             };
             canvas.Children.Add(edge);
+        }
+
+        public void DrawBaseLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, int weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill)
+        {
+            Line edge = new Line
+            {
+                X1 = firstPosX,
+                Y1 = firstPosY,
+                X2 = secondPosX,
+                Y2 = secondPosY,
+                StrokeThickness = size,
+                Stroke = colorStroke
+            };
+            canvas.Children.Add(edge);
+            Rectangle rectangle = new Rectangle {Width = weight.ToString().Length * 10, Height = 15 , Stroke = recColorStroke, Fill = recColorFill };
+            Canvas.SetBottom(rectangle, (-1) * (firstPosY - (firstPosY - secondPosY) / 2) - 5);
+            Canvas.SetLeft(rectangle, firstPosX - (firstPosX - secondPosX) / 2);
+            canvas.Children.Add(rectangle);
+            if (weight != -1)
+            {
+                TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+                Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+                Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+                canvas.Children.Add(textBlock);
+            }
+        }
+
+        public void DrawDirectedLine(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size)
+        {
+            ArrowLine aline1 = new ArrowLine();
+            aline1.Stroke = colorStroke;
+            aline1.StrokeThickness = size;
+            aline1.X1 = firstPosX;
+            aline1.Y1 = firstPosY;
+
+            double dy = secondPosY - firstPosY;
+            double dx = secondPosX - firstPosX;
+            double r = SizeNodeGraph / 2;
+            double l = Math.Sqrt(dx * dx + dy * dy);
+            dx /= l;
+            dy /= l;
+
+            aline1.X2 = secondPosX - dx * r;
+            aline1.Y2 = secondPosY - dy * r;
+            canvas.Children.Add(aline1);
+        }
+
+        public void DrawDirectedLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, int weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill)
+        {
+            ArrowLine aline1 = new ArrowLine();
+            aline1.Stroke = colorStroke;
+            aline1.StrokeThickness = size;
+            aline1.X1 = firstPosX;
+            aline1.Y1 = firstPosY;
+
+            double dy = secondPosY - firstPosY;
+            double dx = secondPosX - firstPosX;
+            double r = SizeNodeGraph / 2;
+            double l = Math.Sqrt(dx * dx + dy * dy);
+            dx /= l;
+            dy /= l;
+
+            aline1.X2 = secondPosX - dx * r;
+            aline1.Y2 = secondPosY - dy * r;
+            canvas.Children.Add(aline1);
+            Rectangle rectangle = new Rectangle { Width = weight.ToString().Length * 10, Height = 15, Stroke = recColorStroke, Fill = recColorFill };
+            Canvas.SetBottom(rectangle, (-1) * (firstPosY - (firstPosY - secondPosY) / 2) - 5);
+            Canvas.SetLeft(rectangle, firstPosX - (firstPosX - secondPosX) / 2);
+            canvas.Children.Add(rectangle);
+            if (weight != -1)
+            {
+                TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+                Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+                Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+                canvas.Children.Add(textBlock);
+            }
         }
 
         public NodeGraph FindNodeInTouch(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
