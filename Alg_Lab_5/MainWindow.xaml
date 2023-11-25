@@ -138,7 +138,9 @@
                         <TextBlock Grid.Column="0" Text="Алгоритмы:"/>
                         <ComboBox Grid.Column="1" ItemsSource="{Binding NameAlgorithms}" SelectedItem="{Binding SelectedNameAlgorithm}" IsEnabled="{Binding IsEnableNamesAlgorithm}"/>
                     </Grid>
-                    <Button Content="Запустить алгоритм" Command="{Binding StartAlgorithm}"/>
+                    <Button Content="Выбрать алгоритм" Command="{Binding StartBaseAlogorithm}" IsEnabled="{Binding IsEnableNamesAlgorithm}"/>
+                    <ItemsControl ItemsSource="{Binding BaseDataForAlgortithm}"/>
+                    <Button Content="Запустить алгоритм" Command="{Binding StartAlgorithm}" IsEnabled="{Binding IsEnableButtonStartAlgorithm}"/>
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>
