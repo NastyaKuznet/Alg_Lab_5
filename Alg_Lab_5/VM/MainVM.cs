@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using Alg_Lab_5.M;
+using Alg_Lab_5.M.Algorithms;
 using Alg_Lab_5.M.FolderGraph;
 using Alg_Lab_5.V.FolderCreateNewGraph;
 using Alg_Lab_5.VM.FolderCreateNewGraphVM;
@@ -606,6 +607,10 @@ namespace Alg_Lab_5.VM
         {
             WorkerMatrix workerMatrix = new WorkerMatrix();
             MatrixGraph = workerMatrix.CreateMatrix(graph.NodeGraphs);
+            List<string> list = new List<string>();
+            DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
+            //list = dfsAlgorithm.Dfs(graph);
+            //int a = 0;
         });
 
         //Down panel
