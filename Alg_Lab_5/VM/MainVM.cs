@@ -1095,7 +1095,8 @@ namespace Alg_Lab_5.VM
 
                     break;
                 case ("Построение минимального остовного дерева"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     bDVM = new BaseDextraVM(graph, bDW, this);
@@ -1125,10 +1126,15 @@ namespace Alg_Lab_5.VM
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
                     algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                break;
+                    
+                    break;
                 case ("Построение минимального остовного дерева"):
-                    algorithmLauncher.BuildMinSpanningTree();
-                break;
+                    algorithmLauncher.BuildMinSpanningTree(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
                     Steps = algorithmLauncher.Steps;

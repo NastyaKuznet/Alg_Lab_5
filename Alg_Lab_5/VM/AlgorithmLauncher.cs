@@ -36,12 +36,17 @@ namespace Alg_Lab_5.VM
 
         public void FindMaxThreadAcrossTrasportNet()
         {
-
+           
         }
 
-        public void BuildMinSpanningTree()
+        public void BuildMinSpanningTree(Graph graph)
         {
-
+            KruskalAlgorithm kruskalAlgorithm = new KruskalAlgorithm(graph);
+            kruskalAlgorithm.GetSteps();
+            HasResult = true;
+            Steps = kruskalAlgorithm.StepsOfCanvases;
+            Comments = kruskalAlgorithm.comments;
+            ButtonSteps = kruskalAlgorithm.ButtonSteps;
         }
 
         public void FindMinPathBetweenTwoNodes(Graph graph, NodeGraph startNode, NodeGraph endNode)
