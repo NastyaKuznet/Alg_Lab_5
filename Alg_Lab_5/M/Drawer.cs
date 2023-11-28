@@ -34,6 +34,30 @@ namespace Alg_Lab_5.M
             canvas.Children.Add(textBlock);
         }
 
+        public void DrawEllipsWithNameWithWeight(double width, double height, SolidColorBrush colorFill, SolidColorBrush colorStroke, double posX, double posY, Canvas canvas, string name, string weitght)
+        {
+            Ellipse node = new Ellipse();
+            node.Width = width;
+            node.Height = height;
+            node.Fill = colorFill;
+            node.Stroke = colorStroke;
+            Canvas.SetBottom(node, (-1) * posY - height / 2);
+            Canvas.SetLeft(node, posX - width / 2);
+            canvas.Children.Add(node);
+            TextBlock textBlock = new TextBlock();
+            textBlock.Foreground = ColorForeGroundTextGraph;
+            textBlock.Text = name;
+            textBlock.FontSize = 12;
+            Canvas.SetBottom(textBlock, (-1) * posY - 4);
+            Canvas.SetLeft(textBlock, posX - 4);
+            canvas.Children.Add(textBlock);
+
+            TextBlock weightNode = new TextBlock { Foreground = ColorWeightNode, Text = weitght, FontSize = 12 };
+            Canvas.SetBottom(weightNode, (-1) * posY + 5);
+            Canvas.SetLeft(weightNode, posX - 4);
+            canvas.Children.Add(weightNode);
+        }
+
         public bool CanDrawEllipsWithoutOverlay(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
         {
             foreach(NodeGraph node in nodesGraph) 

@@ -141,6 +141,24 @@
                     <Button Content="Выбрать алгоритм" Command="{Binding StartBaseAlogorithm}" IsEnabled="{Binding IsEnableNamesAlgorithm}"/>
                     <ItemsControl ItemsSource="{Binding BaseDataForAlgortithm}"/>
                     <Button Content="Запустить алгоритм" Command="{Binding StartAlgorithm}" IsEnabled="{Binding IsEnableButtonStartAlgorithm}"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                        </Grid.RowDefinitions>
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding ButtonSteps}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding Path=Command}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                    
+                    <ScrollViewer>
+                        <TextBlock Text="{Binding TextComents}" TextWrapping="Wrap"/>
+                    </ScrollViewer>
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>

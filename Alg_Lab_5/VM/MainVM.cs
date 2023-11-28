@@ -43,6 +43,11 @@ namespace Alg_Lab_5.VM
         Graph graph;
         int idEdge = 0;
 
+        //для декстры
+        public List<Canvas> Steps = new List<Canvas>();
+        public List<string> Comments = new List<string>();
+        
+
         private string _nameGraph = "";
         public string NameGraph
         {
@@ -236,6 +241,20 @@ namespace Alg_Lab_5.VM
             set { _baseDataForAlgortithm = value; OnPropertyChanged(); }
         }
 
+        private string _textComents = "";
+        public string TextComents
+        {
+            get { return _textComents; }
+            set { _textComents = value; OnPropertyChanged(); }
+        }
+        private ObservableCollection<Button> _buttonSteps = new ObservableCollection<Button>();
+
+        public ObservableCollection<Button> ButtonSteps
+        { 
+            get { return _buttonSteps; } 
+            set { _buttonSteps = value; OnPropertyChanged(); }
+        }
+
         //куча флагов по блокировке кнопок и других элементов
         #region
         private bool _isEnableButtonFile = true;
@@ -373,6 +392,7 @@ namespace Alg_Lab_5.VM
         //File
         public ICommand CreateNewGraph => new CommandDelegate(param =>
         {
+            ClearAll();
             cVM.createGraphW = cUW;
             cUW.DataContext = cVM;
             cUW.ShowDialog();
@@ -1101,8 +1121,28 @@ namespace Alg_Lab_5.VM
                 break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDextra();
                 break;
             }
+            IsEnableButtonStartAlgorithm = false;
+            IsEnableNamesAlgorithm = true;
+        });
+
+        private void BindingButtonDextra()
+        {
+            foreach(Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDextra;
+            }
+        }
+
+        public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param];
+            TextComents = Comments[(int)param];
         });
 
         //Down panel

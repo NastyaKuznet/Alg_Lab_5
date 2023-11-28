@@ -13,6 +13,12 @@ namespace Alg_Lab_5.VM
 {
     public class AlgorithmLauncher
     {
+        public int Result;
+        public bool HasResult;
+        public List<Canvas> Steps = new List<Canvas>();
+        public List<string> Comments = new List<string>();
+        public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
+
         public void BypassWeightedGraphInWidth()
         {
 
@@ -36,7 +42,12 @@ namespace Alg_Lab_5.VM
         public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode)
         {
             Dextra dextra = new Dextra(graph, startNode, endNode);
-            int result = dextra.ResultWeight;
+            dextra.DoDextra();
+            Result = dextra.ResultWeight;
+            HasResult = dextra.HasResult;
+            Steps = dextra.Steps;
+            Comments = dextra.Comments;
+            ButtonSteps = dextra.ButtonSteps;
         }
     }
 }
