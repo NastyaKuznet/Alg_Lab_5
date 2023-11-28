@@ -878,7 +878,7 @@ namespace Alg_Lab_5.VM
             WorkerMatrix workerMatrix = new WorkerMatrix();
             MatrixGraph = workerMatrix.CreateMatrix(graph.NodeGraphs);
             List<string> list = new List<string>();
-            DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
+            //DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
             //list = dfsAlgorithm.Dfs(graph);
             //int a = 0;
         });
@@ -1088,7 +1088,8 @@ namespace Alg_Lab_5.VM
 
                     break;
                 case ("Обход взвешенного графа в глубину"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
 
@@ -1116,8 +1117,12 @@ namespace Alg_Lab_5.VM
                     algorithmLauncher.BypassWeightedGraphInWidth();
                 break;
                 case ("Обход взвешенного графа в глубину"):
-                    algorithmLauncher.BypassWeightedGraphInDepth();
-                break;
+                    algorithmLauncher.BypassWeightedGraphInDepth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск максимального потока через транспортную сеть"):
                     algorithmLauncher.FindMaxThreadAcrossTrasportNet();
                 break;
@@ -1144,10 +1149,24 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private void BindingButtonDfs()
+        {
+            foreach (Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDfs;
+            }
+        }
+
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
             MainCanvas = Steps[(int)param];
             TextComents = Comments[(int)param];
+        });
+
+        public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param+1];
+            TextComents = Comments[(int)param+1];
         });
 
         //Down panel

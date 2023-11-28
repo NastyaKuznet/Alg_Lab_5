@@ -15,7 +15,7 @@ namespace Alg_Lab_5.M
 {
     public class Drawer
     {
-        public void DrawEllipsWithName(double width, double height, SolidColorBrush colorFill, SolidColorBrush colorStroke, double posX, double posY, Canvas canvas, string name)
+        public void DrawEllipsWithName(double width, double height, SolidColorBrush colorFill, SolidColorBrush colorStroke, double posX, double posY, Canvas canvas, string name, SolidColorBrush colorText = null)
         {
             Ellipse node = new Ellipse();
             node.Width = width;
@@ -28,6 +28,7 @@ namespace Alg_Lab_5.M
             TextBlock textBlock = new TextBlock();
             textBlock.Foreground = ColorForeGroundTextGraph;
             textBlock.Text = name;
+            if (colorText != null) { textBlock.Foreground = colorText; }
             textBlock.FontSize = 12;
             Canvas.SetBottom(textBlock, (-1) * posY - 4);
             Canvas.SetLeft(textBlock, posX - 4);

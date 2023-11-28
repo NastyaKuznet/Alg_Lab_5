@@ -24,9 +24,14 @@ namespace Alg_Lab_5.VM
 
         }
 
-        public void BypassWeightedGraphInDepth() 
+        public void BypassWeightedGraphInDepth(Graph graph) 
         {
-        
+            DfsAlgorithm dfsAlgorithm = new DfsAlgorithm(graph);
+            dfsAlgorithm.DoDfs();
+            HasResult = true;
+            Steps = dfsAlgorithm.StepsOfCanvases;
+            Comments = dfsAlgorithm.comments;
+            ButtonSteps = dfsAlgorithm.ButtonSteps;
         }
 
         public void FindMaxThreadAcrossTrasportNet()
@@ -39,7 +44,7 @@ namespace Alg_Lab_5.VM
 
         }
 
-        public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode)
+        public void FindMinPathBetweenTwoNodes(Graph graph, NodeGraph startNode, NodeGraph endNode)
         {
             Dextra dextra = new Dextra(graph, startNode, endNode);
             dextra.DoDextra();
