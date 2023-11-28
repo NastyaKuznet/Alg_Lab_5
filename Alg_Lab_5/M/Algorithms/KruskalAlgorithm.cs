@@ -15,6 +15,7 @@ namespace Alg_Lab_5.M.Algorithms
         private Graph minSpanningTree = new Graph();
         public List<Graph> graphs = new List<Graph>(); 
         public Graph graphBefore = new Graph();
+        Drawer drawer = new Drawer();
         public (List<Edge>, List<string>) GetSteps(Graph graph)
         {
             _steps.Clear();
@@ -30,17 +31,19 @@ namespace Alg_Lab_5.M.Algorithms
             Graph newGraph = new Graph();
             foreach (var edge in edges)
             {
-                foreach(var node in graphBefore.NodeGraphs)
+                foreach (var node in graphBefore.NodeGraphs)
                 {
-                    if(node.Id == edge.StartV)
+                    NodeGraph node1 = drawer.FindNodeInTouch(graphBefore.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                    NodeGraph node2 = drawer.FindNodeInTouch(graphBefore.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                    if (node.Id == node1.Id)
                     {
-                        NodeGraph newNode = new NodeGraph(node.Name, node.PosX, node.PosY);
+                        NodeGraph newNode = new NodeGraph(node.Id, node.Name, node.PosX, node.PosY);
                         newNode.Edges.Add(edge);
                         newGraph.NodeGraphs.AddLast(newNode);
                     }
-                    else if(node.Id == edge.EndV)
+                    else if (node.Id == node2.Id)
                     {
-                        NodeGraph newNode = new NodeGraph(node.Name, node.PosX, node.PosY);
+                        NodeGraph newNode = new NodeGraph(node.Id, node.Name, node.PosX, node.PosY);
                         newNode.Edges.Add(edge);
                         newGraph.NodeGraphs.AddLast(newNode);
                     }
@@ -70,7 +73,12 @@ namespace Alg_Lab_5.M.Algorithms
             edges = edges.OrderBy(x => x.Weight).ToArray();
             StringBuilder builder = new StringBuilder();
             foreach (var edge in edges)
-                builder.Append($"{edge.StartV} -> {edge.EndV} : Вес - {edge.Weight} ");
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                builder.Append($"{node1.Id} -> {node2.Id} : Вес - {edge.Weight} ");
+            }
+                
 
             builder.Append("\n");
             _steps.Add(builder.ToString());
@@ -88,11 +96,13 @@ namespace Alg_Lab_5.M.Algorithms
             while (edgeCount < graph.NodeGraphs.Count - 1)
             {
                 Edge nextEdge = edges[edgeIndex++];
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, nextEdge.FirstPosX, nextEdge.FirstPosY);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, nextEdge.SecondPosX, nextEdge.SecondPosY);
                 //Ищем множества, к которым принадлежат вершины начальная и конечная.
                 _steps.Add("Проверяем к каким множества относятся начальная и конечная точка ребра: ");
-                int setX = Find(parentsSets, nextEdge.StartV);
+                int setX = Find(parentsSets, node1.Id);
 
-                int setY = Find(parentsSets, nextEdge.EndV);
+                int setY = Find(parentsSets, node2.Id);
                 _steps.Add($"Начальная вершина, множество: {setX}. Конечная вершина, множество {setY}. ");
                 //если вершины не из одного множества, то добавляем их в МОД и объединяем их множества.
                 if (setX != setY)

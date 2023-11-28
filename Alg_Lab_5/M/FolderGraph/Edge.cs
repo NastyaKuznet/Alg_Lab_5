@@ -13,16 +13,13 @@ namespace Alg_Lab_5.M.FolderGraph
         public TypeEdge Type { get; set; }
         public int Weight { get; set; }
 
-        public int StartV { get; set; }
-        public int EndV { get; set; }
-
         public double FirstPosX { get; set; }
         public double FirstPosY { get; set; }
 
         public double SecondPosX { get; set; }
         public double SecondPosY { get; set; }
 
-        public Edge(int id) 
+        public Edge(int id)
         {
             Id = id;
         }
