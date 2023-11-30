@@ -155,10 +155,16 @@
                             </ItemsControl>
                         </ScrollViewer>
                     </Grid>
-                    
-                    <ScrollViewer>
-                        <TextBlock Text="{Binding TextComents}" TextWrapping="Wrap"/>
-                    </ScrollViewer>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                        </Grid.RowDefinitions>
+                        <ScrollViewer>
+                            <TextBlock Text="{Binding TextComents}" TextWrapping="Wrap"/>
+                        </ScrollViewer>
+                    </Grid>
+                    <Button Content="Востановить граф" Command="{Binding RestartGraph}"/>
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Mood, StringFormat='Режим: {0}'}"/>
