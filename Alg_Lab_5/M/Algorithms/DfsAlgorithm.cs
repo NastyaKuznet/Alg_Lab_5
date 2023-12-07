@@ -42,6 +42,7 @@ namespace Alg_Lab_5.M.Algorithms
 
         private void StartDFS(int currentVertex, Graph graph, bool[] visitedVertices, NodeGraph currentNode)
         {
+            passNodes.Add(currentNode.Id);
             visitedVertices[currentVertex] = true;
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append($"Ищем не пройденные вершины от {currentNode.Name}");
@@ -56,6 +57,11 @@ namespace Alg_Lab_5.M.Algorithms
                         graphs.Add(GetGraph(edge, graph));
                         stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : не пройдена, добавляем ее");
                         comments.Add(stringBuilder.ToString());
+                        //if (!passNodes.Contains(node.Id))
+                        //{
+                        //    stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : не пройдена, добавляем ее");
+                        //    comments.Add(stringBuilder.ToString());
+                        //}
                         StartDFS(k, graph, visitedVertices, node);
                     }
                     
@@ -64,6 +70,7 @@ namespace Alg_Lab_5.M.Algorithms
                 k++;
             }
         }
+
 
         private bool IsContainEdge(Edge edge, NodeGraph node)
         {
