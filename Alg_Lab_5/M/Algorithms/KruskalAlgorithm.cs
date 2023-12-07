@@ -15,7 +15,6 @@ namespace Alg_Lab_5.M.Algorithms
     public class KruskalAlgorithm
     {
         public List<string> comments = new List<string>();
-        private Graph minSpanningTree = new Graph();
         public List<Graph> graphs = new List<Graph>(); 
         public Graph graphBefore = new Graph();
         Drawer drawer = new Drawer();
@@ -86,7 +85,8 @@ namespace Alg_Lab_5.M.Algorithms
             List<Edge> result = new List<Edge>();
 
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append("Сортируем в порядке возрастания грани графа");
+            int count = 1;
+            stringBuilder.Append($"Шаг {count}\n Сортируем в порядке возрастания грани графа");
             Edge[] edges = edgess.ToArray();
             edges = edges.OrderBy(x => x.Weight).ToArray();
             foreach (var edge in edges)
@@ -96,7 +96,8 @@ namespace Alg_Lab_5.M.Algorithms
                 stringBuilder.Append($"\n{node1.Id} -> {node2.Id} : Вес - {edge.Weight}");
             }
 
-            stringBuilder.Append("\n");
+            stringBuilder.Append("\nБудем проверять пары узлов в этом отсортированном порядке,\nне образуют цикл - добавляем\n" +
+                "образуют - пропускаем\n");
             comments.Add(stringBuilder.ToString());
 
             int[] parentsSets = new int[graph.NodeGraphs.Count];
@@ -105,10 +106,9 @@ namespace Alg_Lab_5.M.Algorithms
             {
                 parentsSets[i] = i;
             }
-
+            count++;
             int edgeCount = 0;
             int edgeIndex = 0;
-
             while (edgeCount < graph.NodeGraphs.Count - 1)
             {
                 Edge nextEdge = edges[edgeIndex++];
@@ -116,51 +116,66 @@ namespace Alg_Lab_5.M.Algorithms
                 NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, nextEdge.SecondPosX, nextEdge.SecondPosY);
 
                 StringBuilder builder = new StringBuilder();
-                //Ищем множества, к которым принадлежат вершины начальная и конечная.
-                //builder.Append("\nПроверяем к каким множества относятся начальная и конечная точка ребра: ");
-
-                builder.Append($"\nПроверяем образуют ли вершины {node1.Name} и {node2.Name} цикл");
+                builder.Append($"Шаг {count}\nПроверяем образуют ли вершины {node1.Name} и {node2.Name} цикл");
                 int setX = Find(parentsSets, node1.Id);
 
                 int setY = Find(parentsSets, node2.Id);
-                builder.Append($"\nНачальная вершина, множество: {setX}. Конечная вершина, множество {setY}. ");
-                //если вершины не из одного множества, то добавляем их в МОД и объединяем их множества.
+                builder.Append($"\n\nВершины:    ");
+                for (int i = 0; i < parentsSets.Length; i++)
+                {
+                    builder.Append($"{i} ");
+                }
+                builder.Append("\nМножества: ");
+                foreach (int temp in parentsSets)
+                {
+                    builder.Append($"{temp} ");
+                }
+                builder.Append($"\n\nВершина {node1.Name}, множество: {setX}\nВершина {node2.Name}, множество: {setY}");
                 if (setX != setY)
                 {
-                    //builder.Append($"\nВершины не из одного множества, объединяем множества {setX} и {setY}. ");
-                    builder.Append($"\nВершины {node1.Name} и {node2.Name} не образуют цикл, добавляем");
+                    builder.Append($"\n\nВершины {node1.Name} и {node2.Name} не образуют цикл, добавляем");
                     result.Add(nextEdge);
                     graphs.Add(GetGraph(result));
                     Union(parentsSets, setX, setY);
                     edgeCount++;
+                    builder.Append($"\n\nВершины:   ");
+                    for (int i = 0; i < parentsSets.Length; i++)
+                    {
+                        builder.Append($"{i} ");
+                    }
+                    builder.Append("\nМножества: ");
+                    foreach (int temp in parentsSets)
+                    {
+                        builder.Append($"{temp} ");
+                    }
                 }
                 else
                 {
                     graphs.Add(graphs[graphs.Count - 1]);
-                    builder.Append($"\nВершины {node1.Name} и {node2.Name} из одного множества, образуют цикл, проверяем следующую пару");
+                    builder.Append($"\n\nВершины {node1.Name} и {node2.Name} образуют цикл, не добавляем");
                 }
                 comments.Add(builder.ToString());
+                count++;
             }
+            StringBuilder builderr = new StringBuilder();
+            graphs.Add(graphs[graphs.Count - 1]);
+            builderr.Append($"Шаг {count}\nВсе вершины пройдены\nПолучили минимальное остовное дерево");
+            comments.Add(builderr.ToString());
             return result;
         }
-        //К какому множеству относится вершина i. (вплоть до vertices - 1 множеств)
+
         private int Find(int[] parentsSets, int i)
         {
-            //comments.Add($"Ищем к какому множетсву относится {i} вершина. ");
             if (parentsSets[i] != i)
             {
-                //comments.Add($"В массиве родителей по индексу самой {i} вершины не находится равное {i} значение. Рекурсивно погружаемся" +
-                //           $" в этот поиск снова, толкьо вместо {i} передаем элемент из массива родителей по {i} индексу ");
                 parentsSets[i] = Find(parentsSets, parentsSets[i]);
             }
 
             return parentsSets[i];
         }
 
-        //Объединение множеств. просто обычный поиск множеств и присваивание первому номер последнего.
         private void Union(int[] parentsSets, int x, int y)
         {
-            //comments.Add($"Объединение: Находим множества X и Y. После присваиваем множеству X тот же номер, что и у Y. ");
             int setX = Find(parentsSets, x);
             int setY = Find(parentsSets, y);
             parentsSets[setX] = setY;

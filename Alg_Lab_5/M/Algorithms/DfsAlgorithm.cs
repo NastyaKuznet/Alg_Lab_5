@@ -21,6 +21,8 @@ namespace Alg_Lab_5.M.Algorithms
         public List<Canvas> StepsOfCanvases = new List<Canvas>();
         Drawer drawer = new Drawer();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
+
+        private List<int> passNodes = new List<int>();
         public DfsAlgorithm(Graph graphDFS)
         {
             graph = graphDFS;
@@ -28,19 +30,22 @@ namespace Alg_Lab_5.M.Algorithms
 
         public void DoDfs()
         {
+            passNodes.Clear();
             comments.Clear();
             StepsOfCanvases.Clear();
             ButtonSteps.Clear();
             bool[] visitedVertices = new bool[graph.NodeGraphs.Count];
             NodeGraph node = graph.NodeGraphs.First();
-            DfsUtil(0, graph, visitedVertices, node);
+            StartDFS(0, graph, visitedVertices, node);
             GetCanvases();
         }
 
-        private void DfsUtil(int currentVertex, Graph graph, bool[] visitedVertices, NodeGraph currentNode)
+        private void StartDFS(int currentVertex, Graph graph, bool[] visitedVertices, NodeGraph currentNode)
         {
+            passNodes.Add(currentNode.Id);
             visitedVertices[currentVertex] = true;
-            comments.Add($"Название вершины: {currentNode.Name}, состояние : пройдена");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append($"Ищем не пройденные вершины от {currentNode.Name}");
             List<NodeGraph> nodes = new List<NodeGraph>();
             int k = 0;
             foreach(NodeGraph node in graph.NodeGraphs)
@@ -50,9 +55,18 @@ namespace Alg_Lab_5.M.Algorithms
                     if(!visitedVertices[k] && IsContainEdge(edge, currentNode))
                     {
                         graphs.Add(GetGraph(edge, graph));
-                        DfsUtil(k, graph, visitedVertices, node);
+                        stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : не пройдена, добавляем ее");
+                        comments.Add(stringBuilder.ToString());
+                        //if (!passNodes.Contains(node.Id))
+                        //{
+                        //    stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : не пройдена, добавляем ее");
+                        //    comments.Add(stringBuilder.ToString());
+                        //}
+                        StartDFS(k, graph, visitedVertices, node);
                     }
+                    
                 }
+                stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : пройдена");
                 k++;
             }
         }
