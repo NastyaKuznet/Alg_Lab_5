@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using Alg_Lab_5.M;
+using Alg_Lab_5.M.Algorithms;
 using Alg_Lab_5.M.FolderGraph;
 using Alg_Lab_5.V.FolderAlgorithms;
 using Alg_Lab_5.V.FolderCreateNewGraph;
@@ -878,6 +879,10 @@ namespace Alg_Lab_5.VM
         {
             WorkerMatrix workerMatrix = new WorkerMatrix();
             MatrixGraph = workerMatrix.CreateMatrix(graph.NodeGraphs);
+            List<string> list = new List<string>();
+            //DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
+            //list = dfsAlgorithm.Dfs(graph);
+            //int a = 0;
         });
 
         public ICommand ChangeEdges => new CommandDelegate(param =>
@@ -1085,13 +1090,15 @@ namespace Alg_Lab_5.VM
 
                     break;
                 case ("Обход взвешенного графа в глубину"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
 
                     break;
                 case ("Построение минимального остовного дерева"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     bDW = new BaseDextraW();
@@ -1115,14 +1122,23 @@ namespace Alg_Lab_5.VM
                     algorithmLauncher.BypassWeightedGraphInWidth();
                 break;
                 case ("Обход взвешенного графа в глубину"):
-                    algorithmLauncher.BypassWeightedGraphInDepth();
-                break;
+                    algorithmLauncher.BypassWeightedGraphInDepth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск максимального потока через транспортную сеть"):
                     algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                break;
+                    
+                    break;
                 case ("Построение минимального остовного дерева"):
-                    algorithmLauncher.BuildMinSpanningTree();
-                break;
+                    algorithmLauncher.BuildMinSpanningTree(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
                     Steps = algorithmLauncher.Steps;
@@ -1143,11 +1159,25 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private void BindingButtonDfs()
+        {
+            foreach (Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDfs;
+            }
+        }
+
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
             MainCanvas = Steps[(int)param];
             TextComents = Comments[(int)param];
         });
+
+
+        public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param+1];
+            TextComents = Comments[(int)param+1];
 
         public ICommand RestartGraph => new CommandDelegate(param =>
         {
@@ -1156,6 +1186,7 @@ namespace Alg_Lab_5.VM
             Comments.Clear();
             ButtonSteps.Clear();
             TextComents = "";
+
         });
 
         //Down panel
