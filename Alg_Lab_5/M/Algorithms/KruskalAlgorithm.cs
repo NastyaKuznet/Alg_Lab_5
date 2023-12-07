@@ -31,7 +31,7 @@ namespace Alg_Lab_5.M.Algorithms
         {
             comments.Clear();
             graphs.Clear();
-            List<Edge> edges = Kruskal(graphBefore);
+            List<Edge> edges = StartKruskal(graphBefore);
             GetGraph(edges);
             GetCanvases();
         }
@@ -67,7 +67,7 @@ namespace Alg_Lab_5.M.Algorithms
 
        
 
-        public List<Edge> Kruskal(Graph graph)
+        public List<Edge> StartKruskal(Graph graph)
         {
             List<int> ids = new List<int>();
             List<Edge> edgess = new List<Edge>();
