@@ -39,9 +39,9 @@ namespace Alg_Lab_5.VM
 
         }
 
-        public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode)
+        public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode, bool allNodes)
         {
-            Dextra dextra = new Dextra(graph, startNode, endNode);
+            Dextra dextra = new Dextra(graph, startNode, endNode, allNodes);
             dextra.DoDextra();
             Result = dextra.ResultWeight;
             HasResult = dextra.HasResult;
