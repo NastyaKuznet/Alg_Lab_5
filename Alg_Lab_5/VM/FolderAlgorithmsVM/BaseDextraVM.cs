@@ -21,6 +21,7 @@ namespace Alg_Lab_5.VM.FolderAlgorithmsVM
         public NodeGraph node1;
         public NodeGraph node2;
         public bool Done = false;
+        public bool AllNodes = false;
 
         //инстументы
         Dictionary<string, NodeGraph> nameNodes = new Dictionary<string, NodeGraph>();
@@ -94,13 +95,18 @@ namespace Alg_Lab_5.VM.FolderAlgorithmsVM
             node1 = nameNodes[SelectedFirstNode];
             ListNodesWithOutFirst = new List<string>(ListNodes);
             ListNodesWithOutFirst.Remove(SelectedFirstNode);
+            ListNodesWithOutFirst.Add("Все вершины");
             IsEnableSecondComboBox = true;
         });
 
         public ICommand AcceptBase => new CommandDelegate(param =>
         {
             if (string.IsNullOrEmpty(SelectedSecondNode) || string.IsNullOrWhiteSpace(SelectedSecondNode)) return;
-            node2 = nameNodes[SelectedSecondNode];
+            AllNodes = SelectedSecondNode.Equals("Все вершины");
+            if(!AllNodes)
+            {
+                node2 = nameNodes[SelectedSecondNode];
+            }
             IsEnableButtonAccept = true;
         });
 
@@ -108,7 +114,16 @@ namespace Alg_Lab_5.VM.FolderAlgorithmsVM
         {
             TextBlock nameAlgorithm = new TextBlock() { Text = "Название алгоритма: Алгоритм Дейкстры" };
             TextBlock textFirstNode = new TextBlock() { Text = "Начальная вершина: " + node1.Name };
-            TextBlock textSecondNode = new TextBlock() { Text = "Конечная вершина: " + node2.Name };
+            TextBlock textSecondNode = new TextBlock();
+            if (AllNodes)
+            {
+                textSecondNode.Text = "Обход всех вершин";
+            }
+            else 
+            {
+                textSecondNode.Text = "Конечная вершина: " + node2.Name;
+            }
+            
             mainVM.BaseDataForAlgortithm.Children.Add(nameAlgorithm);
             mainVM.BaseDataForAlgortithm.Children.Add(textFirstNode);
             mainVM.BaseDataForAlgortithm.Children.Add(textSecondNode);

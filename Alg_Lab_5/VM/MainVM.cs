@@ -50,6 +50,7 @@ namespace Alg_Lab_5.VM
         public List<Canvas> Steps = new List<Canvas>();
         public List<string> Comments = new List<string>();
         
+        
 
         private string _nameGraph = "";
         public string NameGraph
@@ -528,7 +529,7 @@ namespace Alg_Lab_5.VM
 
             NamesNode.Add(new NodeGraphVM(node.Id) { Name = CountNode.ToString(), IsEnable = false });
             ButtonNode.Add(new Button {Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
-            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
+            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode, IsEnabled = false });
 
             CountNode++;
         }
@@ -1140,7 +1141,7 @@ namespace Alg_Lab_5.VM
                     BindingButtonDfs();
                     break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
-                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
+                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2, bDVM.AllNodes);
                     Steps = algorithmLauncher.Steps;
                     Comments = algorithmLauncher.Comments;
                     ButtonSteps = algorithmLauncher.ButtonSteps;
