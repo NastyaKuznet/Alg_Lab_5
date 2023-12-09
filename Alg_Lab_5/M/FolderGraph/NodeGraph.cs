@@ -8,7 +8,6 @@ namespace Alg_Lab_5.M.FolderGraph
 {
     public class NodeGraph
     {
-        static int countId = 0;
         public int Id { get; set; }
         public string Name { get; set; }
         public double PosX { get; set; }
@@ -16,13 +15,12 @@ namespace Alg_Lab_5.M.FolderGraph
 
         public List<Edge> Edges { get; set; } = new List<Edge>();
 
-        public NodeGraph(string name, double posX, double posY)
+        public NodeGraph(int id, string name, double posX, double posY)
         {
-            Id = countId;
+            Id = id;
             Name = name;
             PosX = posX;
             PosY = posY;
-            countId++;
         }
     }
 }

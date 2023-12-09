@@ -11,28 +11,45 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using Alg_Lab_5.M;
+using Alg_Lab_5.M.Algorithms;
 using Alg_Lab_5.M.FolderGraph;
+using Alg_Lab_5.V.FolderAlgorithms;
 using Alg_Lab_5.V.FolderCreateNewGraph;
+using Alg_Lab_5.V.FolderHelpWindow;
+using Alg_Lab_5.VM.FolderAlgorithmsVM;
 using Alg_Lab_5.VM.FolderCreateNewGraphVM;
+using Alg_Lab_5.VM.FolderHelpVM;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using static Alg_Lab_5.M.ImportData;
 
 namespace Alg_Lab_5.VM
 {
-    public class MainVM: BaseVM
+    public class MainVM : BaseVM
     {
         CreateNewGraphW cUW = new CreateNewGraphW();
         CreateNewGraphVM cVM = new CreateNewGraphVM();
+        HelpW helpW = new HelpW();
+        HelpVM helpVM = new HelpVM();
+        BaseDextraW bDW = new BaseDextraW();
+        BaseDextraVM bDVM;
 
         DialogeOpen dialoge = new DialogeOpen();
         string pathFolder = null;
-        int countGraph = 0;
         Graph graph;
+        int idEdge = 0;
+
+        Canvas saveCanvas = new Canvas();
+
+        //для декстры
+        public List<Canvas> Steps = new List<Canvas>();
+        public List<string> Comments = new List<string>();
+        
 
         private string _nameGraph = "";
         public string NameGraph
@@ -57,7 +74,7 @@ namespace Alg_Lab_5.VM
 
         private Canvas _mainCanvas = new Canvas();
         public Canvas MainCanvas
-        { 
+        {
             get { return _mainCanvas; }
             set {
                 _mainCanvas = value;
@@ -130,7 +147,7 @@ namespace Alg_Lab_5.VM
         }
 
         private DataTable _matrixGraph = new DataTable();
-        public DataTable MatrixGraph 
+        public DataTable MatrixGraph
         {
             get { return _matrixGraph; }
             set
@@ -140,7 +157,7 @@ namespace Alg_Lab_5.VM
             }
         }
 
-        private ObservableCollection<string> _typeEdges = new ObservableCollection<string> { "Неориентированные", "Ориентированные"};
+        private ObservableCollection<string> _typeEdges = new ObservableCollection<string> { "Неориентированные", "Ориентированные" };
         public ObservableCollection<string> TypeEdges
         {
             get { return _typeEdges; }
@@ -204,6 +221,41 @@ namespace Alg_Lab_5.VM
                 _buttonCloseEdge = value;
                 OnPropertyChanged();
             }
+        }
+
+        private string[] _nameAlgorithms = {"Обход взвешенного графа в ширину", "Обход взвешенного графа в глубину", "Поиск максимального потока через транспортную сеть", "Построение минимального остовного дерева", "Поиск кратчайшего пути между двумя вершинами графа" };
+        public string[] NameAlgorithms
+        {
+            get { return _nameAlgorithms; }
+            set { _nameAlgorithms= value; OnPropertyChanged(); }
+        }
+
+        private string _selectedNameAlgorithm = "";
+        public string SelectedNameAlgorithm
+        {
+            get { return _selectedNameAlgorithm; }
+            set { _selectedNameAlgorithm = value; OnPropertyChanged(); }
+        }
+        
+        private StackPanel _baseDataForAlgortithm = new StackPanel();
+        public StackPanel BaseDataForAlgortithm
+        {
+            get { return _baseDataForAlgortithm; }
+            set { _baseDataForAlgortithm = value; OnPropertyChanged(); }
+        }
+
+        private string _textComents = "";
+        public string TextComents
+        {
+            get { return _textComents; }
+            set { _textComents = value; OnPropertyChanged(); }
+        }
+        private ObservableCollection<Button> _buttonSteps = new ObservableCollection<Button>();
+
+        public ObservableCollection<Button> ButtonSteps
+        { 
+            get { return _buttonSteps; } 
+            set { _buttonSteps = value; OnPropertyChanged(); }
         }
 
         //куча флагов по блокировке кнопок и других элементов
@@ -310,6 +362,21 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private bool _isEnableNamesAlgorithm = false;
+        public bool IsEnableNamesAlgorithm
+        {
+            get { return _isEnableNamesAlgorithm;}
+            set { _isEnableNamesAlgorithm = value; OnPropertyChanged(); }
+        }
+
+        private bool _isEnableButtonStartAlgorithm = false;
+        
+        public bool IsEnableButtonStartAlgorithm 
+        {
+            get { return _isEnableButtonStartAlgorithm; }
+            set { _isEnableButtonStartAlgorithm = value; OnPropertyChanged(); }
+        }
+
         #endregion
 
         //флаги на то, какие кнопки были нажаты ранее
@@ -318,6 +385,7 @@ namespace Alg_Lab_5.VM
         bool wasOpenGraph = false;
         bool isCreatindNodesMood = false;
         bool isCreatindEdgeMood = false;
+        bool wasChoiceTypeEdgesGraph = false;
         #endregion
         public MainVM()
         {
@@ -327,6 +395,7 @@ namespace Alg_Lab_5.VM
         //File
         public ICommand CreateNewGraph => new CommandDelegate(param =>
         {
+            ClearAll();
             cVM.createGraphW = cUW;
             cUW.DataContext = cVM;
             cUW.ShowDialog();
@@ -336,6 +405,7 @@ namespace Alg_Lab_5.VM
 
         public ICommand OpenGraph => new CommandDelegate(param =>
         {
+            ClearAll();
             pathFolder = dialoge.CallFolderBrowserDialog();
             wasOpenGraph = !string.IsNullOrEmpty(pathFolder);
             if (wasOpenGraph)
@@ -344,23 +414,99 @@ namespace Alg_Lab_5.VM
                 int firstIndexName = pathFolder.LastIndexOf("\\") + 1;
                 NameGraph = pathFolder.Substring(firstIndexName, pathFolder.Length - firstIndexName);
 
+                List<int> unikIdEdge = new List<int>();
                 foreach(NodeGraph node in graph.NodeGraphs)
                 {
                     Drawer drawer = new Drawer();
-                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node.PosX, node.PosY, MainCanvas, node.Name);
-                    AddElementsInSettingPanel(node.Id, node.Name);
-                }
+                    foreach (Edge edge in node.Edges)
+                    {
+                        if (!unikIdEdge.Contains(edge.Id))
+                        {
+                            unikIdEdge.Add(edge.Id);
+                            if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Base))
+                            {
+                                drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                            }
+                            else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Base))
+                            {
+                                drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                            }
+                            else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            {
+                                drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                            }
+                            else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            {
+                                drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                            }
+                            if(idEdge < edge.Id) idEdge = edge.Id;
 
-                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
+                            NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                            NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+                            InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = edge.Type.Equals(TypeEdge.Directed), IsWeight = edge.Weight != 0});
+                            ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                            ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
+                        }
+                    }
+                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node.PosX, node.PosY, MainCanvas, node.Name);
+
+                    NamesNode.Add(new NodeGraphVM(node.Id) { Name = node.Name, IsEnable = false });
+                    ButtonNode.Add(new Button { Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
+                    ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
+
+                }
+                CountNode = graph.NodeGraphs.Count;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableTypeEdges = false; IsEnableNamesAlgorithm = true;
+                wasChoiceTypeEdgesGraph = InfoEdges.Count != 0;
+                if(wasChoiceTypeEdgesGraph)
+                {
+                    if (InfoEdges[0].IsDirected)
+                        SelectedType = "Ориентированные";
+                    else SelectedType = "Неориентированные";
+                    IsHasWeight = InfoEdges[0].IsWeight;
+                }
+                idEdge++;
             }
         });
+
+        private void ClearAll()
+        {
+            pathFolder = null;
+            graph = null;
+            idEdge = 0;
+            NameGraph = "";
+            CountNode = 0;
+            MainCanvas = new Canvas();
+            Mood = "Стандартный";
+            NamesNode = new ObservableCollection<NodeGraphVM>();
+            ButtonNode = new ObservableCollection<Button>();
+            ButtonClose = new ObservableCollection<Button>();
+            MatrixGraph = new DataTable();
+            SelectedType = "Неориентированные";
+            IsHasWeight = false;
+            InfoEdges = new ObservableCollection<EdgeGraphVM>();
+            ButtonEdge = new ObservableCollection<Button>();
+            ButtonCloseEdge = new ObservableCollection<Button>();
+            IsEnableButtonFile = true;
+            IsEnableButtonCreateNewGraph = true;
+            IsEnableButtonOpenGraph = true;
+            IsEnableButtonMood = true;
+            IsEnableButtonCreatingNodes = true;
+            IsEnableButtonUpdate = false;
+            IsEnableButtonCloseMood = false;
+            IsEnableButtonSaveGraph = true;
+            IsEnableButtonCreatingEdge = true;
+            IsEnableTypeEdges = false;
+        }
 
         //Mode
         public ICommand CreatingNodes => new CommandDelegate(param =>
         {
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingEdge = false;
-            isCreatindNodesMood = true; IsEnableButtonCloseMood = true;
+            isCreatindNodesMood = true; IsEnableButtonCloseMood = true; IsEnableNamesAlgorithm = false;
             Mood = Moods["Nodes"];
         });
 
@@ -375,61 +521,35 @@ namespace Alg_Lab_5.VM
             Drawer drawer = new Drawer();
             if (!isCreatindNodesMood || !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY) || !drawer.CanDrawNearEdge(PanelX, PanelY)) return;
 
-            NodeGraph node = new NodeGraph(countGraph.ToString(), PanelX, PanelY);
+            NodeGraph node = new NodeGraph(CountNode,CountNode.ToString(), PanelX, PanelY);
             graph.NodeGraphs.AddLast(node);
 
-            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, countGraph.ToString());
+            drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, PanelX, PanelY, MainCanvas, CountNode.ToString());
 
-            AddElementsInSettingPanel(node.Id, countGraph.ToString());
+            NamesNode.Add(new NodeGraphVM(node.Id) { Name = CountNode.ToString(), IsEnable = false });
+            ButtonNode.Add(new Button {Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
+            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
 
-            countGraph++;
             CountNode++;
-        }
-
-        private void AddElementsInSettingPanel(int id, string name)
-        {
-            AddNamesNodes(id, name); 
-            AddButtonNodes(id ); 
-            AddButtonCancelNodes(id);
-        }
-
-        private void AddNamesNodes(int id, string name)
-        {
-            NodeGraphVM nodeGrapgVM = new NodeGraphVM(id);
-            nodeGrapgVM.Name = name;
-            nodeGrapgVM.IsEnable = false;
-            NamesNode.Add(nodeGrapgVM);
-        }
-
-        private void AddButtonNodes(int id)
-        {
-            Button but = new Button();
-            but.Content = "Изменить";
-            but.CommandParameter = id;
-            but.Command = ChangeSetting;
-            ButtonNode.Add(but);
-        }
-        private void AddButtonCancelNodes(int id)
-        {
-            Button buto = new Button();
-            buto.Content = "X";
-            buto.CommandParameter = id;
-            buto.IsEnabled = false;
-            buto.Command = DeleteNode;
-            ButtonClose.Add(buto);
         }
 
         private void DrawEdge()
         {
+            wasChoiceTypeEdgesGraph = true;
+            if (wasChoiceTypeEdgesGraph)
+            {
+                IsEnableTypeEdges = false;
+            }
+
             switch (SelectedType)
             {
                 case("Неориентированные"):
-                    if (IsHasWeight) { }
+                    if (IsHasWeight) DrawBaseEdgeWeigh();
                     else DrawBaseEdge();
                     break;
                 case ("Ориентированные"):
-                    if(IsHasWeight) { }
-                    else { }
+                    if (IsHasWeight) DrawDirectedEdgeWeihg();
+                    else DrawDirectedEdge(); 
                     break;
             }
         }
@@ -447,6 +567,8 @@ namespace Alg_Lab_5.VM
             {
                 X1 = PanelX;
                 Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 isFirst = false;
             }
             else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
@@ -460,29 +582,170 @@ namespace Alg_Lab_5.VM
             {
                 NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
                 NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
-                drawer.DrawBaseLine(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas);
+                drawer.DrawBaseLine(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
 
-                Edge edge = new Edge() { Type = TypeEdge.Base, FirstPosX = node1.PosX, FirstPosY = node1.PosY,
+                Edge edge = new Edge(idEdge++) { Type = TypeEdge.Base, FirstPosX = node1.PosX, FirstPosY = node1.PosY,
                     SecondPosX = node2.PosX, SecondPosY = node2.PosY };
                 node1.Edges.Add(edge);
                 node2.Edges.Add(edge);
 
-                InfoEdges.Add(new EdgeGraphVM() { FromTo = $"{node1.Name}->{node2.Name}"});
-                ButtonEdge.Add(new Button() {CommandParameter = edge.Id, Content = "Изменить" });
-                ButtonCloseEdge.Add(new Button() {CommandParameter = edge.Id, Content = "X", IsEnabled = false });
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}"});
+                ButtonEdge.Add(new Button() {CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() {CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges});
+                isLine = false;
+            }
+        }
+        
+        private void DrawBaseEdgeWeigh()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawBaseLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, 1, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge(idEdge++)
+                {
+                    Type = TypeEdge.Base,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY,
+                    Weight = 1
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsWeight = true, Weight = 1 });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
                 isLine = false;
             }
         }
 
+        private void DrawDirectedEdge()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawDirectedLine(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge(idEdge++)
+                {
+                    Type = TypeEdge.Directed,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = true });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
+                isLine = false;
+            }
+        }
+
+        private void DrawDirectedEdgeWeihg()
+        {
+            Drawer drawer = new Drawer();
+            if (isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X1 = PanelX;
+                Y1 = PanelY;
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                isFirst = false;
+            }
+            else if (!isFirst && !drawer.CanDrawEllipsWithoutOverlay(graph.NodeGraphs, PanelX, PanelY))
+            {
+                X2 = PanelX;
+                Y2 = PanelY;
+                isFirst = true;
+                isLine = true;
+            }
+            if (isLine)
+            {
+                NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, X1, Y1);
+                NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, X2, Y2);
+                drawer.DrawDirectedLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, 1, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+
+                Edge edge = new Edge(idEdge++)
+                {
+                    Type = TypeEdge.Directed,
+                    FirstPosX = node1.PosX,
+                    FirstPosY = node1.PosY,
+                    SecondPosX = node2.PosX,
+                    SecondPosY = node2.PosY,
+                    Weight = 1
+                };
+                node1.Edges.Add(edge);
+                node2.Edges.Add(edge);
+
+                InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = true, IsWeight = true, Weight = 1 });
+                ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
+                ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
+                isLine = false;
+            }
+        }
 
         public ICommand CreatingEdges => new CommandDelegate(param =>
         {
             if (!wasOpenGraph) return;
             IsEnableButtonFile = false; IsEnableButtonCreateNewGraph = false; IsEnableButtonOpenGraph = false; IsEnableButtonUpdate = false; IsEnableButtonCreatingNodes = false;
-            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true;
+            isCreatindEdgeMood = true; IsEnableButtonCloseMood = true; IsEnableTypeEdges = true; IsEnableNamesAlgorithm = false;
+            if (wasChoiceTypeEdgesGraph) IsEnableTypeEdges = false;
             Mood = Moods["Edges"];
+        });
+
+        //Help
+        public ICommand OpenHelp => new CommandDelegate(param =>
+        {
+            helpW.DataContext = helpVM;
+            helpW.Show();
         });
 
         //Right panel
@@ -563,7 +826,17 @@ namespace Alg_Lab_5.VM
                 {
                     LinkedListNode<NodeGraph> del = currentNode;
                     Drawer drawer = new Drawer();
-                    drawer.DrawEllipsWithName(SizeNodeGraph + 1, SizeNodeGraph + 1, (SolidColorBrush)new BrushConverter().ConvertFrom("#f0f8ff"), (SolidColorBrush)new BrushConverter().ConvertFrom("#f0f8ff"), currentNode.Value.PosX, currentNode.Value.PosY, MainCanvas, "");
+                    
+                    List<object> ids = new List<object>();
+                    foreach(Edge edge in currentNode.Value.Edges)
+                    {
+                        ids.Add(edge.Id);   
+                    }
+                    foreach(object id in ids)
+                    {
+                        DeleteEdgeM(id);
+                    }
+                    drawer.DrawEllipsWithName(SizeNodeGraph + 1, SizeNodeGraph + 1, ColorBackground, ColorBackground, currentNode.Value.PosX, currentNode.Value.PosY, MainCanvas, "");
                     currentNode = currentNode.Next;
                     graph.NodeGraphs.Remove(del);
                     continue;
@@ -606,6 +879,314 @@ namespace Alg_Lab_5.VM
         {
             WorkerMatrix workerMatrix = new WorkerMatrix();
             MatrixGraph = workerMatrix.CreateMatrix(graph.NodeGraphs);
+            List<string> list = new List<string>();
+            //DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
+            //list = dfsAlgorithm.Dfs(graph);
+            //int a = 0;
+        });
+
+        public ICommand ChangeEdges => new CommandDelegate(param =>
+        {
+            foreach (EdgeGraphVM edgeVM in InfoEdges)
+            {
+                if(edgeVM.Id.Equals((int)param))
+                {
+                    if(edgeVM.IsWeight)
+                        edgeVM.IsEnableWeight = true;
+                    break;
+                }
+            }
+            foreach(Button but in ButtonEdge)
+            {
+                if(but.CommandParameter.Equals((int)param))
+                {
+                    but.Content = "Сохранить";
+                    but.Command = SaveEdges;
+                    break;
+                }
+            }
+            foreach(Button but in ButtonCloseEdge)
+            {
+                if(but.CommandParameter.Equals((int)param))
+                {
+                    but.IsEnabled = true;
+                    but.Command = DeleteEdges;
+                    break;
+                }
+            }
+        });
+
+        public ICommand SaveEdges => new CommandDelegate(param =>
+        {
+            int weigh = 0;
+            foreach (EdgeGraphVM edgeVM in InfoEdges)
+            {
+                if (edgeVM.Id.Equals((int)param))
+                {
+                    if (edgeVM.IsWeight)
+                    {
+                        weigh = edgeVM.Weight;
+                        edgeVM.IsEnableWeight = false;
+                        break;
+                    }
+                }
+            }
+            bool canbreak = false;
+            foreach (NodeGraph node in graph.NodeGraphs)
+            {
+                foreach(Edge edge in node.Edges)
+                {
+                    if(edge.Id.Equals((int)param) && edge.Weight != 0)
+                    {
+                        edge.Weight = weigh;
+                        canbreak = true;
+                        Drawer drawer = new Drawer();
+                        NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                        NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                        drawer.DrawBaseLineWeight(node1.PosX, node1.PosY, node2.PosX, node2.PosY, MainCanvas, ColorForeGroundTextGraph, 1, weigh, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+                        break;
+                    }
+                }
+                if (canbreak) break;
+            }
+            foreach (Button but in ButtonEdge)
+            {
+                if (but.CommandParameter.Equals((int)param))
+                {
+                    but.Content = "Изменить";
+                    but.Command = ChangeEdges;
+                    break;
+                }
+            }
+            foreach (Button but in ButtonCloseEdge)
+            {
+                if (but.CommandParameter.Equals((int)param))
+                {
+                    but.IsEnabled = false;
+                    break;
+                }
+            }
+        });
+
+        public ICommand DeleteEdges => new CommandDelegate(param =>
+        {
+            DeleteEdgeM(param);
+            if(InfoEdges.Count == 0)
+            {
+                wasChoiceTypeEdgesGraph = false;
+                IsEnableTypeEdges = true;
+            }
+        });
+
+        private void DeleteEdgeM(object param)
+        {
+            Edge remov = new Edge(-1);
+            bool canbreak = false;
+            foreach (NodeGraph node in graph.NodeGraphs)
+            {
+                foreach (Edge edge in node.Edges)
+                {
+                    if (edge.Id.Equals((int)param))
+                    {
+                        remov = edge;
+                        canbreak = true;
+                        Drawer drawer = new Drawer();
+                        NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                        NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
+                        if (edge.Weight == 0 && !edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawBaseLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                                }
+                            }
+                        }
+                        else if (edge.Weight != 0 && !edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3, -1, ColorBackground, ColorBackground);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawBaseLineWeight(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge1.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph);
+                                }
+                            }
+                        }
+                        else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawDirectedLine(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
+                                }
+                            }
+                        }
+                        else if(edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
+                        {
+                            drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3, -1, ColorBackground, ColorBackground);
+                            foreach (Edge edge1 in node1.Edges)
+                            {
+                                if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
+                                {
+                                    drawer.DrawDirectedLineWeight(edge1.FirstPosX, edge1.FirstPosY, edge1.SecondPosX, edge1.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge1.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph ) ;
+                                }
+                            }
+                        }
+
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
+                        drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
+                        break;
+                    }
+                }
+                if (canbreak)
+                {
+                    node.Edges.Remove(remov);
+                    break;
+                };
+            }
+            EdgeGraphVM remove = new EdgeGraphVM();
+            foreach (EdgeGraphVM edgeVM in InfoEdges)
+            {
+                if (edgeVM.Id.Equals((int)param))
+                {
+                    remove = edgeVM;
+                    break;
+                }
+            }
+            InfoEdges.Remove(remove);
+            Button remo = new Button();
+            foreach (Button but in ButtonEdge)
+            {
+                if (but.CommandParameter.Equals((int)param))
+                {
+                    remo = but;
+                    break;
+                }
+            }
+            ButtonEdge.Remove(remo);
+            foreach (Button but in ButtonCloseEdge)
+            {
+                if (but.CommandParameter.Equals((int)param))
+                {
+                    remo = but;
+                    break;
+                }
+            }
+            ButtonCloseEdge.Remove(remo);
+        }
+
+        public ICommand StartBaseAlogorithm => new CommandDelegate(param =>
+        {
+            switch (SelectedNameAlgorithm)
+            {
+                case ("Обход взвешенного графа в ширину"):
+
+                    break;
+                case ("Обход взвешенного графа в глубину"):
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
+                    break;
+                case ("Поиск максимального потока через транспортную сеть"):
+
+                    break;
+                case ("Построение минимального остовного дерева"):
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
+                    break;
+                case ("Поиск кратчайшего пути между двумя вершинами графа"):
+                    bDW = new BaseDextraW();
+                    bDVM = new BaseDextraVM(graph, bDW, this);
+                    bDW.DataContext = bDVM;
+                    bDW.ShowDialog();
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
+                    break;
+            }
+            
+        });
+
+        public ICommand StartAlgorithm => new CommandDelegate(param =>
+        {
+            saveCanvas = MainCanvas;
+            AlgorithmLauncher algorithmLauncher = new AlgorithmLauncher();
+            switch(SelectedNameAlgorithm)
+            {
+                case ("Обход взвешенного графа в ширину"):
+                    algorithmLauncher.BypassWeightedGraphInWidth();
+                break;
+                case ("Обход взвешенного графа в глубину"):
+                    algorithmLauncher.BypassWeightedGraphInDepth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
+                case ("Поиск максимального потока через транспортную сеть"):
+                    algorithmLauncher.FindMaxThreadAcrossTrasportNet();
+                    
+                    break;
+                case ("Построение минимального остовного дерева"):
+                    algorithmLauncher.BuildMinSpanningTree(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
+                case ("Поиск кратчайшего пути между двумя вершинами графа"):
+                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDextra();
+                break;
+            }
+            IsEnableButtonStartAlgorithm = false;
+            IsEnableNamesAlgorithm = true;
+        });
+
+        private void BindingButtonDextra()
+        {
+            foreach(Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDextra;
+            }
+        }
+
+        private void BindingButtonDfs()
+        {
+            foreach (Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDfs;
+            }
+        }
+
+        public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param];
+            TextComents = Comments[(int)param];
+        });
+
+
+        public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param+1];
+            TextComents = Comments[(int)param+1];
+
+        public ICommand RestartGraph => new CommandDelegate(param =>
+        {
+            MainCanvas = saveCanvas;
+            Steps.Clear();
+            Comments.Clear();
+            ButtonSteps.Clear();
+            TextComents = "";
+
         });
 
         //Down panel
@@ -619,7 +1200,7 @@ namespace Alg_Lab_5.VM
                 graph = new Graph();
                 graph.Name = NameGraph;
                 wasOpenGraph = true;
-                IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true;
+                IsEnableButtonMood = true; IsEnableButtonCreatingNodes = true; IsEnableButtonSaveGraph = true; IsEnableButtonCreatingEdge = true; IsEnableNamesAlgorithm = true;
             }
             IsEnableButtonUpdate = false;
         });
@@ -629,14 +1210,14 @@ namespace Alg_Lab_5.VM
             if(isCreatindNodesMood)
             {
                 IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingEdge = true;
-                isCreatindNodesMood = false;
+                isCreatindNodesMood = false; IsEnableNamesAlgorithm = true;
                 IsEnableButtonCloseMood = false;
                 Mood = Moods["Standart"];
             }
             if(isCreatindEdgeMood)
             {
                 IsEnableButtonFile = true; IsEnableButtonCreateNewGraph = true; IsEnableButtonOpenGraph = true; IsEnableButtonUpdate = true; IsEnableButtonCreatingNodes = true;
-                isCreatindEdgeMood = false; 
+                isCreatindEdgeMood = false; IsEnableNamesAlgorithm = true;
                 IsEnableButtonCloseMood = false; IsEnableTypeEdges = false;
                 Mood = Moods["Standart"];
             }
@@ -644,7 +1225,9 @@ namespace Alg_Lab_5.VM
 
         public ICommand SaveGraph => new CommandDelegate(param =>
         {
-            new FileProcessing().SaveGraph(pathFolder, graph);
+            FileProcessing fileProcessing = new FileProcessing();
+            fileProcessing.SaveGraph(pathFolder, graph);
+            fileProcessing.SaveMatrix(pathFolder, new WorkerMatrix().CreateMatrix(graph.NodeGraphs));
         });
     }
 }

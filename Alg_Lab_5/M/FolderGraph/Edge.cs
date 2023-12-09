@@ -8,7 +8,6 @@ namespace Alg_Lab_5.M.FolderGraph
 {
     public class Edge
     {
-        static int countId = 0;
         public int Id { get; set; }
 
         public TypeEdge Type { get; set; }
@@ -20,10 +19,9 @@ namespace Alg_Lab_5.M.FolderGraph
         public double SecondPosX { get; set; }
         public double SecondPosY { get; set; }
 
-        public Edge() 
+        public Edge(int id)
         {
-            Id = countId;
-            countId++;
+            Id = id;
         }
     }
 
