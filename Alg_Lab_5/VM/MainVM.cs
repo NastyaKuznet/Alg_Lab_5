@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using Alg_Lab_5.M;
+using Alg_Lab_5.M.Algorithms;
 using Alg_Lab_5.M.FolderGraph;
 using Alg_Lab_5.V.FolderAlgorithms;
 using Alg_Lab_5.V.FolderCreateNewGraph;
@@ -43,9 +44,12 @@ namespace Alg_Lab_5.VM
         Graph graph;
         int idEdge = 0;
 
+        Canvas saveCanvas = new Canvas();
+
         //для декстры
         public List<Canvas> Steps = new List<Canvas>();
         public List<string> Comments = new List<string>();
+        
         
 
         private string _nameGraph = "";
@@ -525,7 +529,7 @@ namespace Alg_Lab_5.VM
 
             NamesNode.Add(new NodeGraphVM(node.Id) { Name = CountNode.ToString(), IsEnable = false });
             ButtonNode.Add(new Button {Content = "Изменить", CommandParameter = node.Id, Command = ChangeSetting });
-            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode });
+            ButtonClose.Add(new Button { Content = "X", CommandParameter = node.Id, Command = DeleteNode, IsEnabled = false });
 
             CountNode++;
         }
@@ -876,6 +880,10 @@ namespace Alg_Lab_5.VM
         {
             WorkerMatrix workerMatrix = new WorkerMatrix();
             MatrixGraph = workerMatrix.CreateMatrix(graph.NodeGraphs);
+            List<string> list = new List<string>();
+            //DfsAlgorithm dfsAlgorithm = new DfsAlgorithm();
+            //list = dfsAlgorithm.Dfs(graph);
+            //int a = 0;
         });
 
         public ICommand ChangeEdges => new CommandDelegate(param =>
@@ -990,7 +998,7 @@ namespace Alg_Lab_5.VM
                         NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                         if (edge.Weight == 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
-                            drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                            drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3);
                             foreach (Edge edge1 in node1.Edges)
                             {
                                 if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
@@ -1001,7 +1009,7 @@ namespace Alg_Lab_5.VM
                         }
                         else if (edge.Weight != 0 && !edge.Type.Equals(TypeEdge.Directed))
                         {
-                            drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
+                            drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3, -1, ColorBackground, ColorBackground);
                             foreach (Edge edge1 in node1.Edges)
                             {
                                 if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
@@ -1012,7 +1020,7 @@ namespace Alg_Lab_5.VM
                         }
                         else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
                         {
-                            drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2);
+                            drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3);
                             foreach (Edge edge1 in node1.Edges)
                             {
                                 if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
@@ -1023,7 +1031,7 @@ namespace Alg_Lab_5.VM
                         }
                         else if(edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
                         {
-                            drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 2, -1, ColorBackground, ColorBackground);
+                            drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorBackground, 3, -1, ColorBackground, ColorBackground);
                             foreach (Edge edge1 in node1.Edges)
                             {
                                 if (node2.Edges.Contains(edge1) && !edge.Equals(edge1))
@@ -1083,15 +1091,18 @@ namespace Alg_Lab_5.VM
 
                     break;
                 case ("Обход взвешенного графа в глубину"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
 
                     break;
                 case ("Построение минимального остовного дерева"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
+                    bDW = new BaseDextraW();
                     bDVM = new BaseDextraVM(graph, bDW, this);
                     bDW.DataContext = bDVM;
                     bDW.ShowDialog();
@@ -1104,6 +1115,7 @@ namespace Alg_Lab_5.VM
 
         public ICommand StartAlgorithm => new CommandDelegate(param =>
         {
+            saveCanvas = MainCanvas;
             AlgorithmLauncher algorithmLauncher = new AlgorithmLauncher();
             switch(SelectedNameAlgorithm)
             {
@@ -1111,16 +1123,25 @@ namespace Alg_Lab_5.VM
                     algorithmLauncher.BypassWeightedGraphInWidth();
                 break;
                 case ("Обход взвешенного графа в глубину"):
-                    algorithmLauncher.BypassWeightedGraphInDepth();
-                break;
+                    algorithmLauncher.BypassWeightedGraphInDepth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск максимального потока через транспортную сеть"):
                     algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                break;
+                    
+                    break;
                 case ("Построение минимального остовного дерева"):
-                    algorithmLauncher.BuildMinSpanningTree();
-                break;
+                    algorithmLauncher.BuildMinSpanningTree(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
-                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2);
+                    algorithmLauncher.FindMinPathBetweenTwoNodes(graph, bDVM.node1, bDVM.node2, bDVM.AllNodes);
                     Steps = algorithmLauncher.Steps;
                     Comments = algorithmLauncher.Comments;
                     ButtonSteps = algorithmLauncher.ButtonSteps;
@@ -1139,10 +1160,35 @@ namespace Alg_Lab_5.VM
             }
         }
 
+        private void BindingButtonDfs()
+        {
+            foreach (Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDfs;
+            }
+        }
+
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
             MainCanvas = Steps[(int)param];
             TextComents = Comments[(int)param];
+        });
+
+
+        public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param + 1];
+            TextComents = Comments[(int)param + 1];
+        });
+
+        public ICommand RestartGraph => new CommandDelegate(param =>
+        {
+            MainCanvas = saveCanvas;
+            Steps.Clear();
+            Comments.Clear();
+            ButtonSteps.Clear();
+            TextComents = "";
+
         });
 
         //Down panel

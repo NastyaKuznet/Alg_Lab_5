@@ -19,7 +19,7 @@ namespace Alg_Lab_5.M.FolderGraph
         public double SecondPosX { get; set; }
         public double SecondPosY { get; set; }
 
-        public Edge(int id) 
+        public Edge(int id)
         {
             Id = id;
         }
