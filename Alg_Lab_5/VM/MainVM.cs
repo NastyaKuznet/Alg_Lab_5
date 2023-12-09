@@ -1176,8 +1176,9 @@ namespace Alg_Lab_5.VM
 
         public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
         {
-            MainCanvas = Steps[(int)param+1];
-            TextComents = Comments[(int)param+1];
+            MainCanvas = Steps[(int)param + 1];
+            TextComents = Comments[(int)param + 1];
+        });
 
         public ICommand RestartGraph => new CommandDelegate(param =>
         {

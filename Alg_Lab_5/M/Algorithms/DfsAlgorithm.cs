@@ -115,7 +115,7 @@ namespace Alg_Lab_5.M.Algorithms
                 List<Edge> edges = GetUnicEdges(tempGraph);
                 foreach (Edge edge in edges)
                 {
-                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 1);
+                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 2);
                 }
                 foreach (NodeGraph node in tempGraph.NodeGraphs)
                 {
