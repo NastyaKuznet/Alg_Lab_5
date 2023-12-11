@@ -1,73 +1,74 @@
-﻿using Alg_Lab_5.M.FolderGraph;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Forms.VisualStyles;
-using System.Windows.Media;
+using Alg_Lab_5.M.FolderGraph;
 using static Alg_Lab_5.M.ImportData;
 
-namespace Alg_Lab_5.M.Algorithms
+namespace Alg_Lab_5.M.Algorithms;
+
+public class BfsAlgorithm
 {
-    public class DfsAlgorithm
+    public Graph graph = new Graph();
+    public List<string> comments = new List<string>();
+    public List<Graph> graphs = new List<Graph>();
+    private Drawer _drawer = new Drawer();
+    public List<Canvas> StepsOfCanvases = new List<Canvas>();
+    Drawer drawer = new Drawer();
+    public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
+
+    public BfsAlgorithm(Graph graphBFS)
     {
-        public Graph graph = new Graph();
-        public List<string> comments = new List<string>();
-        public List<Graph> graphs = new List<Graph>();
-        private Drawer _drawer = new Drawer();
-        public List<Canvas> StepsOfCanvases = new List<Canvas>();
-        Drawer drawer = new Drawer();
-        public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
+        graph = graphBFS;
+    }
 
-        private List<int> passNodes = new List<int>();
-        public DfsAlgorithm(Graph graphDFS)
+    public void DoBFS()
+    {
+        comments.Clear();
+        StepsOfCanvases.Clear();
+        ButtonSteps.Clear();
+        bool[] visitedVertices = new bool[graph.NodeGraphs.Count];
+        Queue<NodeGraph> queue = new Queue<NodeGraph>();
+        queue.Enqueue(graph.NodeGraphs.First());
+        BFS(queue, visitedVertices);
+        GetCanvases();
+    }
+    private void BFS(Queue<NodeGraph> queue, bool[] visitedVertices)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        var first = queue.Peek();
+        stringBuilder.Append($"Ищем не пройденные вершины от начальной:{first.Name}");
+        while (queue.Count != 0)
         {
-            graph = graphDFS;
-        }
-
-        public void DoDfs()
-        {
-            passNodes.Clear();
-            comments.Clear();
-            StepsOfCanvases.Clear();
-            ButtonSteps.Clear();
-            bool[] visitedVertices = new bool[graph.NodeGraphs.Count];
-            NodeGraph node = graph.NodeGraphs.First();
-            StartDFS(0, graph, visitedVertices, node);
-            GetCanvases();
-        }
-
-        private void StartDFS(int currentVertex, Graph graph, bool[] visitedVertices, NodeGraph currentNode)
-        {
-            passNodes.Add(currentNode.Id);
-            visitedVertices[currentVertex] = true;
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append($"Ищем не пройденные вершины от {currentNode.Name}");
-            List<NodeGraph> nodes = new List<NodeGraph>();
-            int k = 0;
+            var currentNode = queue.Dequeue();
+            int count = 0;
+            stringBuilder.Append($"\nРассматриваем соседей вершины {currentNode.Name}\n");
             foreach(NodeGraph node in graph.NodeGraphs)
             {
                 foreach(Edge edge in node.Edges)
                 {
-                    if(!visitedVertices[k] && IsContainEdge(edge, currentNode))
+                    if (visitedVertices[count] && IsContainEdge(edge, currentNode))
+                    {
+                        stringBuilder.Append($"\nВершина {node.Name} уже пройдена");
+                    }
+                    if(!visitedVertices[count] && IsContainEdge(edge, currentNode))
                     {
                         graphs.Add(GetGraph(edge, graph));
-                        stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : не пройдена, добавляем ее");
+                        visitedVertices[count] = true;
+                        stringBuilder.Append($"\n\nВершина {node.Name}\nЕщё не пройдена,\nпомечаем эту вершину пройденной - туда больше пути нет.");
                         comments.Add(stringBuilder.ToString());
-                        StartDFS(k, graph, visitedVertices, node);
+                        queue.Enqueue(node);
                     }
-                    
                 }
-                stringBuilder.Append($"\n\nВершина {node.Name}\nсостояние : пройдена");
-                k++;
+                count++;
             }
         }
-
-
-        private bool IsContainEdge(Edge edge, NodeGraph node)
+        
+    }
+    
+    private bool IsContainEdge(Edge edge, NodeGraph node)
         {
             foreach(Edge tempEdge in node.Edges)
             {
@@ -110,11 +111,11 @@ namespace Alg_Lab_5.M.Algorithms
                 List<Edge> edges = GetUnicEdges(tempGraph);
                 foreach (Edge edge in edges)
                 {
-                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 1);
+                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForBfs, 1);
                 }
                 foreach (NodeGraph node in tempGraph.NodeGraphs)
                 {
-                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForDfs, ColorStrokeForDfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
+                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForBfs, ColorStrokeForBfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
                 }
                 StepsOfCanvases.Add(canvas);
                 ButtonSteps.Add(new Button() { CommandParameter = count - 1, Content = $"Шаг{++count}" });
@@ -146,5 +147,5 @@ namespace Alg_Lab_5.M.Algorithms
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraph);
             }
         }
-    }
+    
 }

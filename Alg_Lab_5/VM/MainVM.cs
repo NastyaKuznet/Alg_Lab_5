@@ -1087,14 +1087,16 @@ namespace Alg_Lab_5.VM
             switch (SelectedNameAlgorithm)
             {
                 case ("Обход взвешенного графа в ширину"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Обход взвешенного графа в глубину"):
                     IsEnableNamesAlgorithm = false;
                     IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Построение минимального остовного дерева"):
                     IsEnableNamesAlgorithm = false;
@@ -1109,7 +1111,6 @@ namespace Alg_Lab_5.VM
                     IsEnableButtonStartAlgorithm = true;
                     break;
             }
-            
         });
 
         public ICommand StartAlgorithm => new CommandDelegate(param =>
@@ -1119,8 +1120,12 @@ namespace Alg_Lab_5.VM
             switch(SelectedNameAlgorithm)
             {
                 case ("Обход взвешенного графа в ширину"):
-                    algorithmLauncher.BypassWeightedGraphInWidth();
-                break;
+                    algorithmLauncher.BypassWeightedGraphInWidth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonBfs();
+                    break;
                 case ("Обход взвешенного графа в глубину"):
                     algorithmLauncher.BypassWeightedGraphInDepth(graph);
                     Steps = algorithmLauncher.Steps;
@@ -1129,8 +1134,11 @@ namespace Alg_Lab_5.VM
                     BindingButtonDfs();
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-                    algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                    
+                    algorithmLauncher.FindMaxThreadAcrossTransportNet(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonFordFalkerson();
                     break;
                 case ("Построение минимального остовного дерева"):
                     algorithmLauncher.BuildMinSpanningTree(graph);
@@ -1166,6 +1174,25 @@ namespace Alg_Lab_5.VM
                 button.Command = ButtonAlgorithmDfs;
             }
         }
+        private void BindingButtonBfs()
+        {
+            foreach (Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmBfs;
+            }
+        }
+        private void BindingButtonFordFalkerson()
+        {
+            foreach(Button button in ButtonSteps)
+            {
+                button.Command = ButtonAlgorithmDextra;
+            }
+        }
+        public ICommand ButtonAlgorithmBfs => new CommandDelegate(param =>
+        {
+            MainCanvas = Steps[(int)param + 1];
+            TextComents = Comments[(int)param + 1];
+        });
 
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
@@ -1176,8 +1203,9 @@ namespace Alg_Lab_5.VM
 
         public ICommand ButtonAlgorithmDfs => new CommandDelegate(param =>
         {
-            MainCanvas = Steps[(int)param+1];
-            TextComents = Comments[(int)param+1];
+            MainCanvas = Steps[(int)param + 1];
+            TextComents = Comments[(int)param + 1];
+        });
 
         public ICommand RestartGraph => new CommandDelegate(param =>
         {

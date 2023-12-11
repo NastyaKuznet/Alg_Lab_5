@@ -19,9 +19,14 @@ namespace Alg_Lab_5.VM
         public List<string> Comments = new List<string>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
 
-        public void BypassWeightedGraphInWidth()
+        public void BypassWeightedGraphInWidth(Graph graph)
         {
-
+            BfsAlgorithm bfsAlgorithm = new BfsAlgorithm(graph);
+            bfsAlgorithm.DoBFS();
+            HasResult = true;
+            Steps = bfsAlgorithm.StepsOfCanvases;
+            Comments = bfsAlgorithm.comments;
+            ButtonSteps = bfsAlgorithm.ButtonSteps;
         }
 
         public void BypassWeightedGraphInDepth(Graph graph) 
@@ -34,9 +39,14 @@ namespace Alg_Lab_5.VM
             ButtonSteps = dfsAlgorithm.ButtonSteps;
         }
 
-        public void FindMaxThreadAcrossTrasportNet()
+        public void FindMaxThreadAcrossTransportNet(Graph graph)
         {
-           
+            FordFalkersonAlgorithm fordFalkersonAlgorithm = new FordFalkersonAlgorithm(graph);
+            fordFalkersonAlgorithm.DoFordFalkerson();
+            HasResult = true;
+            Steps = fordFalkersonAlgorithm.StepsCanvases;
+            Comments = fordFalkersonAlgorithm.comments;
+            ButtonSteps = fordFalkersonAlgorithm.ButtonSteps;
         }
 
         public void BuildMinSpanningTree(Graph graph)
