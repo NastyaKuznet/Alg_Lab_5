@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Xml.Linq;
@@ -206,7 +207,6 @@ namespace Alg_Lab_5.M.Algorithms
             {
                 foreach(Edge edge in itemDextra.Node.Edges)
                 {
-
                     if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Base))
                     {
                         drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
@@ -219,7 +219,7 @@ namespace Alg_Lab_5.M.Algorithms
                     {
                         drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
                     }
-                    else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                    else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
                     {
                         drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
@@ -229,6 +229,9 @@ namespace Alg_Lab_5.M.Algorithms
 
                     DrawNode(currentCanvas, nodes[node1]);
                     DrawNode(currentCanvas, nodes[node2]);
+                    //Drawll(currentCanvas, nodes[node1]);
+                    //Drawll(currentCanvas, nodes[node2]);
+
                 }
             }
         }
@@ -237,7 +240,7 @@ namespace Alg_Lab_5.M.Algorithms
         {
             if (itemDextra.WeightNode == -1)
             {
-                if (itemDextra.IsPickOut)
+                if(itemDextra.IsPickOut)
                     drawer.DrawEllipsWithNameWithWeight(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, itemDextra.Node.PosX, itemDextra.Node.PosY, currentCanvas, itemDextra.Node.Name, "INF");
                 else
                     drawer.DrawEllipsWithNameWithWeight(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, itemDextra.Node.PosX, itemDextra.Node.PosY, currentCanvas, itemDextra.Node.Name, "INF");
@@ -248,6 +251,66 @@ namespace Alg_Lab_5.M.Algorithms
                     drawer.DrawEllipsWithNameWithWeight(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, itemDextra.Node.PosX, itemDextra.Node.PosY, currentCanvas, itemDextra.Node.Name, itemDextra.WeightNode.ToString());
                 else
                     drawer.DrawEllipsWithNameWithWeight(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, itemDextra.Node.PosX, itemDextra.Node.PosY, currentCanvas, itemDextra.Node.Name, itemDextra.WeightNode.ToString());
+            }
+        }
+
+        private void Drawll(Canvas currentCanvas, ItemDextra itemDextra)
+        {
+            List<int> keys = new List<int>();
+            foreach(NodeGraph node in graph.NodeGraphs)
+            {
+                foreach(Edge edge in node.Edges)
+                {
+                    foreach(Edge edge1 in itemDextra.Node.Edges)
+                    {
+                        //ItemDextra tempItemD = new ItemDextra();
+                        //if (!nodes.TryGetValue(node, out tempItemD))
+                        //{
+                        //    if(edge.Id == edge1.Id && tempItemD.IsPickOut)
+                        //    {
+                        //        keys.Add(edge1.Id);
+                        //    }
+                        //}
+
+                        if (nodes.ContainsKey(node))
+                        {
+                            ItemDextra tempItemD = nodes[node];
+                            if (edge.Id == edge1.Id && tempItemD.IsPickOut)
+                            {
+                                keys.Add(edge1.Id);
+                            }
+                        }
+                         
+                    }
+                }
+            }
+            int temp = 1;
+            foreach (Edge edge in itemDextra.Node.Edges)
+            {
+                if(keys.Contains(edge.Id))
+                {
+                    temp = 2;
+                }
+                if (keys.Contains(edge.Id))
+                {
+                    temp = 1;
+                }
+                if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Base))
+                {
+                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, temp);
+                }
+                else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Base))
+                {
+                    drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, temp, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                }
+                else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                {
+                    drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, temp);
+                }
+                else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
+                {
+                    drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, temp, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                }
             }
         }
     }

@@ -196,7 +196,7 @@ namespace Alg_Lab_5.M.Algorithms
                 List<Edge> edges = GetUnicEdges(tempGraph);
                 foreach (Edge edge in edges)
                 {
-                    drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph);
+                    drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 2, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillNodeGraph);
                 }
                 foreach (NodeGraph node in tempGraph.NodeGraphs)
                 {

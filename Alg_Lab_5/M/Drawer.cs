@@ -43,6 +43,9 @@ namespace Alg_Lab_5.M
             node.Height = height;
             node.Fill = colorFill;
             node.Stroke = colorStroke;
+
+            node.StrokeThickness = 2;
+
             Canvas.SetBottom(node, (-1) * posY - height / 2);
             Canvas.SetLeft(node, posX - width / 2);
             canvas.Children.Add(node);
