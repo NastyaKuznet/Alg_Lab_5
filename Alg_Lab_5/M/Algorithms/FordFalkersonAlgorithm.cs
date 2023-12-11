@@ -9,23 +9,31 @@ namespace Alg_Lab_5.M.Algorithms;
 public class FordFalkersonAlgorithm
 {
     private Graph graph = new Graph();
-    private List<string> _steps = new List<string>();
-    public List<Canvas> StepsCanvases = new List<Canvas>();
+    public List<Graph> graphs = new List<Graph>();
+    NodeGraph startNode;
+    NodeGraph endNode;
+    
+    private Drawer _drawer = new Drawer();
+
+
     public List<string> comments = new List<string>();
+    public List<Canvas> StepsCanvases = new List<Canvas>();
+    private List<string> _steps = new List<string>();
     public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
 
-    public FordFalkersonAlgorithm(Graph graphFordFalkerson)
+    public FordFalkersonAlgorithm(Graph graphFordFalkerson, NodeGraph startNode, NodeGraph endNode)
     {
         graph = graphFordFalkerson;
-
+        this.startNode = startNode;
+        this.endNode = endNode;
     }
 
     public void DoFordFalkerson()
     {
         
     }
+    
     //первое лист всех путей вершин, второе лист всех шагов
-
     public (List<List<string>>, List<string>) GetSteps(Graph graph, int vertices, int source, int sink)
     {
         _steps.Clear();
@@ -73,12 +81,6 @@ public class FordFalkersonAlgorithm
             /* Это своеобразные ребра, по которым можно вернуть жидкость обратно из одной точки в другую.
              * Этто нужно для оптимального решения, так как иногда путь, который мы нашли, может быть не оптимальным и
              * просто перекроет другие пути. Для этого нужны обратные ребра, по которым можно "вернуться".
-             *
-             * Пример: граф в форме ромба с одной диагональю, А-исток, Д-сток, ВС-ребро в середине, АВ=7, ВС=4, СД=5,
-             * АС=3, ВД=4. Предположим, первым найден путь АВСД, вычитаем максимум (4),
-             * остаточная сеть остается АВ=3, ВС=0, СД=1, СВ=4 (обратное ребро). Дальше находим пути АВД и АСД,
-             * остается сеть АВ=0, ВД=1, АС=2, СД=0, и при отсутствии обратного ребра СВ решение неоптимально из-за
-             * перегрузки пути АВСД. Но оно есть и мы находим ещё один путь АСВД на 1 и получаем ответ 4+3+1+1=9.
              */
             for (int i = sink; i != source; i = parents[i])
             {

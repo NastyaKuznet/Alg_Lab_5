@@ -1,0 +1,29 @@
+﻿<Window x:Class="Alg_Lab_5.V.FolderAlgorithms.NodesForFordFalkersonW"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Alg_Lab_5.V.FolderAlgorithms"
+        mc:Ignorable="d"
+        Title="NodesForFordFalkerson" Height="300" Width="300">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width='100'/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2">
+            <TextBlock Text="Алгортм Форда Фалкерсона"/>
+            <TextBlock Text="Введите вершину - исток (начальная):"/>
+            <ComboBox ItemsSource="{Binding ListNodes}" SelectedItem="{Binding SelectedFirstNode}"/>
+            <Button Content="Применить" Command="{Binding AcceptBaseFirst}"/>
+            <TextBlock Text="Введите вершину - сток (конечная):"/>
+            <ComboBox ItemsSource="{Binding ListNodesWithOutFirst}" SelectedItem="{Binding SelectedSecondNode}" IsEnabled="{Binding IsEnableSecondComboBox}"/>
+            <Button Content="Применить" Command="{Binding AcceptBase}" IsEnabled="{Binding IsEnableSecondComboBox}"/>
+        </StackPanel>
+        <Button Grid.Column="1" Grid.Row="1" Content="Применить" Command="{Binding Accept}" IsEnabled="{Binding IsEnableButtonAccept}"/>
+    </Grid>
+</Window>

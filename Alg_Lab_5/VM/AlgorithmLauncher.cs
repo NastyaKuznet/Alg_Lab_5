@@ -39,9 +39,9 @@ namespace Alg_Lab_5.VM
             ButtonSteps = dfsAlgorithm.ButtonSteps;
         }
 
-        public void FindMaxThreadAcrossTransportNet(Graph graph)
+        public void FindMaxThreadAcrossTransportNet(Graph graph, NodeGraph startNode, NodeGraph endNode)
         {
-            FordFalkersonAlgorithm fordFalkersonAlgorithm = new FordFalkersonAlgorithm(graph);
+            FordFalkersonAlgorithm fordFalkersonAlgorithm = new FordFalkersonAlgorithm(graph, startNode, endNode);
             fordFalkersonAlgorithm.DoFordFalkerson();
             HasResult = true;
             Steps = fordFalkersonAlgorithm.StepsCanvases;

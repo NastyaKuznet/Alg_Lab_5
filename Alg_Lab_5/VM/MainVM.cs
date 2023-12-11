@@ -39,6 +39,10 @@ namespace Alg_Lab_5.VM
         BaseDextraW bDW = new BaseDextraW();
         BaseDextraVM bDVM;
 
+        NodesForFordFalkersonW fordFalkersonW = new NodesForFordFalkersonW();
+        FordFalkersonVM fordFalkersonVm;
+        
+
         DialogeOpen dialoge = new DialogeOpen();
         string pathFolder = null;
         Graph graph;
@@ -1095,6 +1099,10 @@ namespace Alg_Lab_5.VM
                     IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
+                    fordFalkersonW = new NodesForFordFalkersonW();
+                    fordFalkersonVm = new FordFalkersonVM(graph, fordFalkersonW, this);
+                    fordFalkersonW.DataContext = fordFalkersonVm;
+                    fordFalkersonW.ShowDialog();
                     IsEnableNamesAlgorithm = false;
                     IsEnableButtonStartAlgorithm = true;
                     break;
@@ -1134,7 +1142,7 @@ namespace Alg_Lab_5.VM
                     BindingButtonDfs();
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-                    algorithmLauncher.FindMaxThreadAcrossTransportNet(graph);
+                    algorithmLauncher.FindMaxThreadAcrossTransportNet(graph, fordFalkersonVm.StartNode, fordFalkersonVm.EndNode);
                     Steps = algorithmLauncher.Steps;
                     Comments = algorithmLauncher.Comments;
                     ButtonSteps = algorithmLauncher.ButtonSteps;
