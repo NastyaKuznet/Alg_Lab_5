@@ -189,7 +189,7 @@ namespace Alg_Lab_5.M
             }
         }
 
-        public void DrawDirectedLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, int weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill)
+        public void DrawDirectedLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, int weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill, string FFA = null)
         {
             if (firstPosX == secondPosX && firstPosY == secondPosY)
             {
@@ -219,7 +219,14 @@ namespace Alg_Lab_5.M
                 canvas.Children.Add(rectangle);
                 if (weight != -1)
                 {
-                    TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+                    TextBlock textBlock = new TextBlock { 
+                        Foreground = colorStroke, 
+                        Text = weight.ToString(), 
+                        FontSize = 10 };
+                    if(FFA != null)
+                    {
+                        textBlock.Text = FFA;
+                    }
                     Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
                     Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
                     canvas.Children.Add(textBlock);

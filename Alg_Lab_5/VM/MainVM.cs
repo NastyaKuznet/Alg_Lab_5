@@ -439,7 +439,7 @@ namespace Alg_Lab_5.VM
                             {
                                 drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
                             }
-                            else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            else if(edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
                             {
                                 drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                             }
@@ -1204,8 +1204,8 @@ namespace Alg_Lab_5.VM
 
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
-            MainCanvas = Steps[(int)param];
-            TextComents = Comments[(int)param];
+            MainCanvas = Steps[(int)param + 1];
+            TextComents = Comments[(int)param + 1];
         });
 
 
