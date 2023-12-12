@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 using static Alg_Lab_5.M.ImportData;
 
@@ -17,7 +18,7 @@ namespace Alg_Lab_5.M.Algorithms
         Graph graph;
         NodeGraph source;
         NodeGraph stock;
-        int startFlow = 0;
+        int pastFlow = 0;
         int flow = 0;
         //NodeGraph currentNode;
         Dictionary<int, ItemEdgeFord> itemsEdge = new Dictionary<int, ItemEdgeFord>();
@@ -35,16 +36,18 @@ namespace Alg_Lab_5.M.Algorithms
         public int Result;
         public List<Canvas> Steps = new List<Canvas>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
+        public List<string> Comments = new List<string>();
 
         public FordFalcersonN(Graph graph)
         {
             this.graph = graph;
             hasResult.Add(FindSource());
             hasResult.Add(FindStock());
-            //currentNode = source;
             AddItems();
             DoFordFalcerson(source);
             Result = CheckSum();
+
+            CommentFinal();
         }
 
         public void DoFordFalcerson(NodeGraph currentNode)
@@ -53,21 +56,11 @@ namespace Alg_Lab_5.M.Algorithms
             {
                 SetFlow();
 
-                Canvas newCanvas2 = new Canvas();
-                DrawGraph(newCanvas2);
-                Steps.Add(newCanvas2);
-                ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+                CommentSetFlow();
 
                 return;
             }
             DesignationsElements(currentNode);
-                    
-            BaskVisited();
-
-            Canvas newCanvas = new Canvas();
-            DrawGraph(newCanvas);
-            Steps.Add(newCanvas);
-            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
         }
 
         private bool FindSource()
@@ -138,6 +131,7 @@ namespace Alg_Lab_5.M.Algorithms
                 NodeGraph secondNode = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                 if (secondNode.Equals(currentNode))
                     continue;
+                CommentNonFlow(edge, currentNode, secondNode);
                 if (flow < edge.Weight - itemsEdge[edge.Id].flow && !itemsNode[secondNode].isVisited)
                 {
                     itemsEdge[edge.Id].isVisited = true;
@@ -145,14 +139,17 @@ namespace Alg_Lab_5.M.Algorithms
                     stackNode.Push(itemsNode[secondNode]);
                     itemsNode[secondNode].isVisited = true;
 
-                    Canvas newCanvas = new Canvas();
-                    DrawGraph(newCanvas);
-                    Steps.Add(newCanvas);
-                    ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+                    CommentFlow(currentNode, secondNode);
 
                     DoFordFalcerson(secondNode);
+
+                    itemsEdge[edge.Id].isVisited = false;
+                    itemsNode[secondNode].isVisited = false;
+
+                    CommetnBack(currentNode);
                 }
             }
+            CommentNonEdgeEven(currentNode);
         }
 
         private int MinFlow()
@@ -170,25 +167,13 @@ namespace Alg_Lab_5.M.Algorithms
         {
             int currentFlow = 0;
             currentFlow = MinFlow();
+            pastFlow = currentFlow;
             while (stackEdge.Count > 0)
-            {   
+            {
                 ItemEdgeFord itemEdge = stackEdge.Pop();
                 itemEdge.flow = currentFlow;
             }
             results.Add(currentFlow);
-        }
-
-        private void BaskVisited()
-        {
-            foreach(ItemEdgeFord edgeFord in itemsEdge.Values)
-            {
-                edgeFord.isVisited = false;
-            }
-
-            foreach(ItemNodeFord nodeFord in itemsNode.Values)
-            {
-                nodeFord.isVisited = false;
-            }
         }
 
         private int CheckSum()
@@ -201,32 +186,70 @@ namespace Alg_Lab_5.M.Algorithms
             return sum;
         }
 
+        private void CommentNonFlow(Edge edge, NodeGraph currentNode, NodeGraph secondNode)
+        {
+            if (0 >= edge.Weight - itemsEdge[edge.Id].flow)
+            {
+                Canvas newCanvas2 = new Canvas();
+                DrawGraph(newCanvas2);
+                Steps.Add(newCanvas2);
+                ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+                Comments.Add($"Нельзя проложить поток, потому что поток у ребра {itemsEdge[edge.Id].flow} полностью закрывает его вес {edge.Weight} с вершинами {currentNode.Name} и {secondNode.Name}.");
+            }
+        }
+
+        private void CommentFlow(NodeGraph currentNode, NodeGraph secondNode)
+        {
+            Canvas newCanvas = new Canvas();
+            DrawGraph(newCanvas);
+            Steps.Add(newCanvas);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+            Comments.Add($"Пойдем по пути от вершины {currentNode.Name} до вершины {secondNode.Name}, так как по этому пути можно проложить " +
+                $"поток.");
+        }
+
+        private void CommetnBack(NodeGraph currentNode)
+        {
+            Canvas newCanvas2 = new Canvas();
+            DrawGraph(newCanvas2);
+            Steps.Add(newCanvas2);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+            Comments.Add($"Вернемся назад на одно ребро назад и проверим остальные пути вершины {currentNode.Name}.");
+        }
+
+        private void CommentNonEdgeEven(NodeGraph currentNode)
+        {
+            Canvas newCanvas3 = new Canvas();
+            DrawGraph(newCanvas3);
+            Steps.Add(newCanvas3);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+            Comments.Add($"У вершины {currentNode.Name} больше нет ребер.");
+        }
+
+        private void CommentSetFlow()
+        {
+            Canvas newCanvas2 = new Canvas();
+            DrawGraph(newCanvas2);
+            Steps.Add(newCanvas2);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+            Comments.Add($"Устанавливаем проложенному пути поток {pastFlow}.");
+        }
+
+        private void CommentFinal()
+        {
+            Canvas newCanvas = new Canvas();
+            DrawGraph(newCanvas);
+            Steps.Add(newCanvas);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+            Comments.Add($"Расчет максимального потока равен {Result}.");
+        }
+
         private void DrawGraph(Canvas currentCanvas)
         {
             foreach (ItemNodeFord itemNode in itemsNode.Values)
             {
                 foreach (Edge edge in itemNode.node.Edges)
                 {
-
-                    //if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Base))
-                    //{
-                    //    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
-                    //}
-                    //else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Base))
-                    //{
-                    //    drawer.DrawBaseLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
-                    //}
-                    //else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
-                    //{
-                    //    drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
-                    //}
-                    /*else */
-
-                    NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
-                    int a;
-                    if (node1.Id == 0)
-                        a = 3;
-
                     if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && !itemsEdge[edge.Id].isVisited)
                     {
                         drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
@@ -236,8 +259,7 @@ namespace Alg_Lab_5.M.Algorithms
                         drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorStrokeSelectedNodeGraph, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
 
-
-                    
+                    NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                     NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
 
                     DrawNode(currentCanvas, itemsNode[node1]);

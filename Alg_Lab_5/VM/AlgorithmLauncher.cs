@@ -40,6 +40,7 @@ namespace Alg_Lab_5.VM
             //fordFalcerson.DoFordFalcerson();
             Steps = fordFalcerson.Steps;
             ButtonSteps = fordFalcerson.ButtonSteps;
+            Comments = fordFalcerson.Comments;
         }
 
         public void BuildMinSpanningTree(Graph graph)

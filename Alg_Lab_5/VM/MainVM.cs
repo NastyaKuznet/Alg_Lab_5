@@ -1134,6 +1134,7 @@ namespace Alg_Lab_5.VM
                     algorithmLauncher.FindMaxThreadAcrossTrasportNet(graph);
                     Steps = algorithmLauncher.Steps;
                     ButtonSteps = algorithmLauncher.ButtonSteps;
+                    Comments = algorithmLauncher.Comments;
                     BindingButtonDextra();
                     break;
                 case ("Построение минимального остовного дерева"):
@@ -1174,7 +1175,7 @@ namespace Alg_Lab_5.VM
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
             MainCanvas = Steps[(int)param];
-            //TextComents = Comments[(int)param];
+            TextComents = Comments[(int)param];
         });
 
 
