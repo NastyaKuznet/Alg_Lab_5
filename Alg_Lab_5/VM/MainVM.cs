@@ -1095,7 +1095,8 @@ namespace Alg_Lab_5.VM
                     IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Построение минимального остовного дерева"):
                     IsEnableNamesAlgorithm = false;
@@ -1130,8 +1131,11 @@ namespace Alg_Lab_5.VM
                     BindingButtonDfs();
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-                    algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                    
+                    algorithmLauncher.FindMaxThreadAcrossTrasportNet(graph);
+                    Steps = algorithmLauncher.Steps;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    Comments = algorithmLauncher.Comments;
+                    BindingButtonDextra();
                     break;
                 case ("Построение минимального остовного дерева"):
                     algorithmLauncher.BuildMinSpanningTree(graph);

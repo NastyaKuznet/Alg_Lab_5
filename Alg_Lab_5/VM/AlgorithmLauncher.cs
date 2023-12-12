@@ -34,9 +34,12 @@ namespace Alg_Lab_5.VM
             ButtonSteps = dfsAlgorithm.ButtonSteps;
         }
 
-        public void FindMaxThreadAcrossTrasportNet()
+        public void FindMaxThreadAcrossTrasportNet(Graph graph)
         {
-           
+            FordFalcersonN fordFalcerson = new FordFalcersonN(graph);
+            Steps = fordFalcerson.Steps;
+            ButtonSteps = fordFalcerson.ButtonSteps;
+            Comments = fordFalcerson.Comments;
         }
 
         public void BuildMinSpanningTree(Graph graph)
