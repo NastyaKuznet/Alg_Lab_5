@@ -20,7 +20,6 @@ namespace Alg_Lab_5.M.Algorithms
         NodeGraph stock;
         int pastFlow = 0;
         int flow = 0;
-        //NodeGraph currentNode;
         Dictionary<int, ItemEdgeFord> itemsEdge = new Dictionary<int, ItemEdgeFord>();
         Dictionary<NodeGraph, ItemNodeFord> itemsNode = new Dictionary<NodeGraph, ItemNodeFord>();
         Stack<ItemNodeFord> stackNode = new Stack<ItemNodeFord>();
