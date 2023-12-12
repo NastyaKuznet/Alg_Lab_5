@@ -20,7 +20,7 @@ namespace Alg_Lab_5.M.Algorithms
         int startFlow = 0;
         int flow = 0;
         //NodeGraph currentNode;
-        Dictionary<Edge, ItemEdgeFord> itemsEdge = new Dictionary<Edge, ItemEdgeFord>();
+        Dictionary<int, ItemEdgeFord> itemsEdge = new Dictionary<int, ItemEdgeFord>();
         Dictionary<NodeGraph, ItemNodeFord> itemsNode = new Dictionary<NodeGraph, ItemNodeFord>();
         Stack<ItemNodeFord> stackNode = new Stack<ItemNodeFord>();
         Stack<ItemEdgeFord> stackEdge = new Stack<ItemEdgeFord>();
@@ -52,11 +52,22 @@ namespace Alg_Lab_5.M.Algorithms
             if(currentNode.Equals(stock))
             {
                 SetFlow();
+
+                Canvas newCanvas2 = new Canvas();
+                DrawGraph(newCanvas2);
+                Steps.Add(newCanvas2);
+                ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+
                 return;
             }
             DesignationsElements(currentNode);
                     
             BaskVisited();
+
+            Canvas newCanvas = new Canvas();
+            DrawGraph(newCanvas);
+            Steps.Add(newCanvas);
+            ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
         }
 
         private bool FindSource()
@@ -113,8 +124,8 @@ namespace Alg_Lab_5.M.Algorithms
             {
                 foreach(Edge edge in node.Edges)
                 {
-                    if(!itemsEdge.ContainsKey(edge))
-                        itemsEdge.Add(edge, new ItemEdgeFord(edge));
+                    if(!itemsEdge.ContainsKey(edge.Id))
+                        itemsEdge.Add(edge.Id, new ItemEdgeFord(edge));
                 }
                 itemsNode.Add(node, new ItemNodeFord(node));
             }
@@ -127,12 +138,18 @@ namespace Alg_Lab_5.M.Algorithms
                 NodeGraph secondNode = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                 if (secondNode.Equals(currentNode))
                     continue;
-                if (flow < edge.Weight - itemsEdge[edge].flow && !itemsNode[secondNode].isVisited)
+                if (flow < edge.Weight - itemsEdge[edge.Id].flow && !itemsNode[secondNode].isVisited)
                 {
-                    itemsEdge[edge].isVisited = true;
-                    stackEdge.Push(itemsEdge[edge]);
+                    itemsEdge[edge.Id].isVisited = true;
+                    stackEdge.Push(itemsEdge[edge.Id]);
                     stackNode.Push(itemsNode[secondNode]);
                     itemsNode[secondNode].isVisited = true;
+
+                    Canvas newCanvas = new Canvas();
+                    DrawGraph(newCanvas);
+                    Steps.Add(newCanvas);
+                    ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
+
                     DoFordFalcerson(secondNode);
                 }
             }
@@ -143,8 +160,8 @@ namespace Alg_Lab_5.M.Algorithms
             int min = int.MaxValue;
             foreach(ItemEdgeFord edge in stackEdge)
             {
-                if(edge.edge.Weight - itemsEdge[edge.edge].flow < min)
-                    min = edge.edge.Weight - itemsEdge[edge.edge].flow;
+                if(edge.edge.Weight - itemsEdge[edge.edge.Id].flow < min)
+                    min = edge.edge.Weight - itemsEdge[edge.edge.Id].flow;
             }
             return min;
         }
@@ -203,12 +220,24 @@ namespace Alg_Lab_5.M.Algorithms
                     //{
                     //    drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
                     //}
-                    /*else */if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
-                    {
-                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, itemsEdge[edge].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
-                    }
+                    /*else */
 
                     NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
+                    int a;
+                    if (node1.Id == 0)
+                        a = 3;
+
+                    if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && !itemsEdge[edge.Id].isVisited)
+                    {
+                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                    }
+                    else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && itemsEdge[edge.Id].isVisited)
+                    {
+                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorStrokeSelectedNodeGraph, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                    }
+
+
+                    
                     NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
 
                     DrawNode(currentCanvas, itemsNode[node1]);

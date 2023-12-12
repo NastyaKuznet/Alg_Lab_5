@@ -255,13 +255,17 @@ namespace Alg_Lab_5.M
                 Canvas.SetBottom(rectangle, (-1) * (firstPosY - (firstPosY - secondPosY) / 2) - 5);
                 Canvas.SetLeft(rectangle, firstPosX - (firstPosX - secondPosX) / 2);
                 canvas.Children.Add(rectangle);
-                //if (weight != -1)
-                //{
-                //    TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
-                //    Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
-                //    Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
-                //    canvas.Children.Add(textBlock);
-                //}
+            TextBlock textBlock = new TextBlock { Foreground = ColorForeGroundTextGraph, Text = weight.ToString(), FontSize = 10 };
+            Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+            Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+            canvas.Children.Add(textBlock);
+            //if (weight != -1)
+            //{
+            //    TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+            //    Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+            //    Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+            //    canvas.Children.Add(textBlock);
+            //}
             //}
         }
 
