@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
@@ -25,7 +26,7 @@ namespace Alg_Lab_5.M.Algorithms
         Stack<ItemNodeFord> stackNode = new Stack<ItemNodeFord>();
         Stack<ItemEdgeFord> stackEdge = new Stack<ItemEdgeFord>();
         List<int> results = new List<int>();
-        int numberStep = 0;
+        int numberStep = 1;
 
         //инструменты
         Drawer drawer = new Drawer();
@@ -36,7 +37,7 @@ namespace Alg_Lab_5.M.Algorithms
         public List<Canvas> Steps = new List<Canvas>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
         public List<string> Comments = new List<string>();
-
+        bool flag = true;
         public FordFalcersonN(Graph graph)
         {
             this.graph = graph;
@@ -45,13 +46,12 @@ namespace Alg_Lab_5.M.Algorithms
             AddItems();
             DoFordFalcerson(source);
             Result = CheckSum();
-
             CommentFinal();
         }
 
         public void DoFordFalcerson(NodeGraph currentNode)
         {
-            if(currentNode.Equals(stock))
+            if (currentNode.Equals(stock))
             {
                 SetFlow();
 
@@ -255,7 +255,7 @@ namespace Alg_Lab_5.M.Algorithms
                     }
                     else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && itemsEdge[edge.Id].isVisited)
                     {
-                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorStrokeSelectedNodeGraph, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorFillForBfs, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
 
                     NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
@@ -270,7 +270,7 @@ namespace Alg_Lab_5.M.Algorithms
         private void DrawNode(Canvas currentCanvas, ItemNodeFord itemNode)
         {
             if (itemNode.isVisited)
-                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorFillForBfs, itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
             else
                 drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
         

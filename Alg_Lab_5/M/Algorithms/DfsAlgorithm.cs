@@ -115,11 +115,11 @@ namespace Alg_Lab_5.M.Algorithms
                 List<Edge> edges = GetUnicEdges(tempGraph);
                 foreach (Edge edge in edges)
                 {
-                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForLine, 2);
+                    drawer.DrawBaseLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, canvas, ColorFillForBfs, 2);
                 }
                 foreach (NodeGraph node in tempGraph.NodeGraphs)
                 {
-                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForDfs, ColorStrokeForDfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
+                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForBfs, ColorStrokeForBfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
                 }
                 StepsOfCanvases.Add(canvas);
                 ButtonSteps.Add(new Button() { CommandParameter = count - 1, Content = $"Шаг{++count}" });

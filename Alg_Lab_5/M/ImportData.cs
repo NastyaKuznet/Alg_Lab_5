@@ -26,5 +26,9 @@ namespace Alg_Lab_5.M
         public static SolidColorBrush ColorFillForDfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#8B008B");
         public static SolidColorBrush ColorStrokeForDfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#4B0082");
         public static SolidColorBrush ColorFillForLine = (SolidColorBrush)new BrushConverter().ConvertFrom("#EE82EE");
+
+        public static SolidColorBrush ColorFillForBfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#ff0000");
+        public static SolidColorBrush ColorStrokeForBfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#ff0000");
+
     }
 }

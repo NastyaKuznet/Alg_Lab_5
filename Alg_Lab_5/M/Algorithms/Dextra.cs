@@ -23,7 +23,7 @@ namespace Alg_Lab_5.M.Algorithms
         NodeGraph startNode;
         NodeGraph endNode;
         ItemDextra currentNode;
-        int numberStep = 0;
+        int numberStep = 1;
         bool allNodes;
 
         //инструменты

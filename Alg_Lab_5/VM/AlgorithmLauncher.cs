@@ -19,50 +19,91 @@ namespace Alg_Lab_5.VM
         public List<string> Comments = new List<string>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
 
-        public void BypassWeightedGraphInWidth()
+        public void BypassWeightedGraphInWidth(Graph graph)
         {
-
+            try
+            {
+                BfsAlgorithm bfsAlgorithm = new BfsAlgorithm(graph);
+                bfsAlgorithm.DoBFS();
+                HasResult = true;
+                Steps = bfsAlgorithm.StepsOfCanvases;
+                Comments = bfsAlgorithm.comments;
+                ButtonSteps = bfsAlgorithm.ButtonSteps;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректный тип графа для данного алгоритма");
+            }
         }
 
         public void BypassWeightedGraphInDepth(Graph graph) 
         {
-            DfsAlgorithm dfsAlgorithm = new DfsAlgorithm(graph);
-            dfsAlgorithm.DoDfs();
-            HasResult = true;
-            Steps = dfsAlgorithm.StepsOfCanvases;
-            Comments = dfsAlgorithm.comments;
-            ButtonSteps = dfsAlgorithm.ButtonSteps;
+            try
+            {
+                DfsAlgorithm dfsAlgorithm = new DfsAlgorithm(graph);
+                dfsAlgorithm.DoDfs();
+                HasResult = true;
+                Steps = dfsAlgorithm.StepsOfCanvases;
+                Comments = dfsAlgorithm.comments;
+                ButtonSteps = dfsAlgorithm.ButtonSteps;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректный тип графа для данного алгоритма");
+            }
+            
         }
 
         public void FindMaxThreadAcrossTrasportNet(Graph graph)
         {
-            FordFalcersonN fordFalcerson = new FordFalcersonN(graph);
-            Steps = fordFalcerson.Steps;
-            ButtonSteps = fordFalcerson.ButtonSteps;
-            Comments = fordFalcerson.Comments;
+            try
+            {
+                FordFalcersonN fordFalcerson = new FordFalcersonN(graph);
+                Steps = fordFalcerson.Steps;
+                ButtonSteps = fordFalcerson.ButtonSteps;
+                Comments = fordFalcerson.Comments;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректный тип графа для данного алгоритма");
+            }
         }
 
         public void BuildMinSpanningTree(Graph graph)
         {
-            KruskalAlgorithm kruskalAlgorithm = new KruskalAlgorithm(graph);
-            kruskalAlgorithm.GetSteps();
-            HasResult = true;
-            Steps = kruskalAlgorithm.StepsOfCanvases;
-            Comments = kruskalAlgorithm.comments;
-            ButtonSteps = kruskalAlgorithm.ButtonSteps;
+            try
+            {
+                KruskalAlgorithm kruskalAlgorithm = new KruskalAlgorithm(graph);
+                kruskalAlgorithm.GetSteps();
+                HasResult = true;
+                Steps = kruskalAlgorithm.StepsOfCanvases;
+                Comments = kruskalAlgorithm.comments;
+                ButtonSteps = kruskalAlgorithm.ButtonSteps;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректный тип графа для данного алгоритма");
+            }
         }
 
 
         public void FindMinPathBetweenTwoNodes(Graph graph,NodeGraph startNode, NodeGraph endNode, bool allNodes)
-
         {
-            Dextra dextra = new Dextra(graph, startNode, endNode, allNodes);
-            dextra.DoDextra();
-            Result = dextra.ResultWeight;
-            HasResult = dextra.HasResult;
-            Steps = dextra.Steps;
-            Comments = dextra.Comments;
-            ButtonSteps = dextra.ButtonSteps;
+            try
+            {
+                Dextra dextra = new Dextra(graph, startNode, endNode, allNodes);
+                dextra.DoDextra();
+                Result = dextra.ResultWeight;
+                HasResult = dextra.HasResult;
+                Steps = dextra.Steps;
+                Comments = dextra.Comments;
+                ButtonSteps = dextra.ButtonSteps;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректный тип графа для данного алгоритма");
+            }
+            
         }
     }
 }

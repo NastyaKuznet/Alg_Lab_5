@@ -93,7 +93,7 @@ namespace Alg_Lab_5.M.Algorithms
             {
                 NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
                 NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
-                stringBuilder.Append($"\n{node1.Id} -> {node2.Id} : Вес - {edge.Weight}");
+                stringBuilder.Append($"\n{node1.Name} -> {node2.Name} : Вес - {edge.Weight}");
             }
 
             stringBuilder.Append("\nБудем проверять пары узлов в этом отсортированном порядке,\nне образуют цикл - добавляем\n" +
@@ -200,7 +200,7 @@ namespace Alg_Lab_5.M.Algorithms
                 }
                 foreach (NodeGraph node in tempGraph.NodeGraphs)
                 {
-                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForDfs, ColorStrokeForDfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
+                    drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillForDfs, ColorFillForDfs, node.PosX, node.PosY, canvas, node.Name, ColorForeGroundTextGraphW);
                 }
                 StepsOfCanvases.Add(canvas);
                 ButtonSteps.Add(new Button() { CommandParameter = count - 1, Content = $"Шаг{++count}" });

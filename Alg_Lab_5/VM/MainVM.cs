@@ -1088,7 +1088,8 @@ namespace Alg_Lab_5.VM
             switch (SelectedNameAlgorithm)
             {
                 case ("Обход взвешенного графа в ширину"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Обход взвешенного графа в глубину"):
                     IsEnableNamesAlgorithm = false;
@@ -1121,8 +1122,12 @@ namespace Alg_Lab_5.VM
             switch(SelectedNameAlgorithm)
             {
                 case ("Обход взвешенного графа в ширину"):
-                    algorithmLauncher.BypassWeightedGraphInWidth();
-                break;
+                    algorithmLauncher.BypassWeightedGraphInWidth(graph);
+                    Steps = algorithmLauncher.Steps;
+                    Comments = algorithmLauncher.Comments;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDfs();
+                    break;
                 case ("Обход взвешенного графа в глубину"):
                     algorithmLauncher.BypassWeightedGraphInDepth(graph);
                     Steps = algorithmLauncher.Steps;
@@ -1156,6 +1161,7 @@ namespace Alg_Lab_5.VM
             IsEnableNamesAlgorithm = true;
         });
 
+
         private void BindingButtonDextra()
         {
             foreach(Button button in ButtonSteps)
@@ -1171,6 +1177,7 @@ namespace Alg_Lab_5.VM
                 button.Command = ButtonAlgorithmDfs;
             }
         }
+
 
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
