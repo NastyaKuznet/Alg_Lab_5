@@ -226,6 +226,44 @@ namespace Alg_Lab_5.M
             }
         }
 
+        public void DrawDirectedLineWeight(double firstPosX, double firstPosY, double secondPosX, double secondPosY, Canvas canvas, SolidColorBrush colorStroke, double size, string weight, SolidColorBrush recColorStroke, SolidColorBrush recColorFill)
+        {
+            //if (firstPosX == secondPosX && firstPosY == secondPosY)
+            //{
+            //    DrawCircleLineWeight(firstPosX, secondPosY, canvas, colorStroke, size, weight, recColorStroke, recColorFill);
+            //}
+            //else
+            //{
+                ArrowLine aline1 = new ArrowLine();
+                aline1.Stroke = colorStroke;
+                aline1.StrokeThickness = size;
+                aline1.X1 = firstPosX;
+                aline1.Y1 = firstPosY;
+
+                double dy = secondPosY - firstPosY;
+                double dx = secondPosX - firstPosX;
+                double r = SizeNodeGraph / 2;
+                double l = Math.Sqrt(dx * dx + dy * dy);
+                dx /= l;
+                dy /= l;
+
+                aline1.X2 = secondPosX - dx * r;
+                aline1.Y2 = secondPosY - dy * r;
+                canvas.Children.Add(aline1);
+                Rectangle rectangle = new Rectangle { Width = weight.ToString().Length * 10, Height = 15, Stroke = recColorStroke, Fill = recColorFill };
+                Canvas.SetBottom(rectangle, (-1) * (firstPosY - (firstPosY - secondPosY) / 2) - 5);
+                Canvas.SetLeft(rectangle, firstPosX - (firstPosX - secondPosX) / 2);
+                canvas.Children.Add(rectangle);
+                //if (weight != -1)
+                //{
+                //    TextBlock textBlock = new TextBlock { Foreground = colorStroke, Text = weight.ToString(), FontSize = 10 };
+                //    Canvas.SetBottom(textBlock, (-1) * (firstPosY - (firstPosY - secondPosY) / 2 + 2));
+                //    Canvas.SetLeft(textBlock, firstPosX - (firstPosX - secondPosX) / 2 + 2);
+                //    canvas.Children.Add(textBlock);
+                //}
+            //}
+        }
+
         public NodeGraph FindNodeInTouch(LinkedList<NodeGraph> nodesGraph, double posX, double posY)
         {
             foreach(NodeGraph node in nodesGraph)

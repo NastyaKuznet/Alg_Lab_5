@@ -435,7 +435,7 @@ namespace Alg_Lab_5.VM
                             {
                                 drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1);
                             }
-                            else if(edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                            else if(edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
                             {
                                 drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, MainCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                             }
@@ -1089,10 +1089,11 @@ namespace Alg_Lab_5.VM
 
                     break;
                 case ("Поиск максимального потока через транспортную сеть"):
-
+                    IsEnableNamesAlgorithm = false;
+                    IsEnableButtonStartAlgorithm = true;
                     break;
                 case ("Построение минимального остовного дерева"):
-
+                    
                     break;
                 case ("Поиск кратчайшего пути между двумя вершинами графа"):
                     bDW = new BaseDextraW();
@@ -1119,8 +1120,11 @@ namespace Alg_Lab_5.VM
                     algorithmLauncher.BypassWeightedGraphInDepth();
                 break;
                 case ("Поиск максимального потока через транспортную сеть"):
-                    algorithmLauncher.FindMaxThreadAcrossTrasportNet();
-                break;
+                    algorithmLauncher.FindMaxThreadAcrossTrasportNet(graph);
+                    Steps = algorithmLauncher.Steps;
+                    ButtonSteps = algorithmLauncher.ButtonSteps;
+                    BindingButtonDextra();
+                    break;
                 case ("Построение минимального остовного дерева"):
                     algorithmLauncher.BuildMinSpanningTree();
                 break;
@@ -1147,7 +1151,7 @@ namespace Alg_Lab_5.VM
         public ICommand ButtonAlgorithmDextra => new CommandDelegate(param =>
         {
             MainCanvas = Steps[(int)param];
-            TextComents = Comments[(int)param];
+            //TextComents = Comments[(int)param];
         });
 
         public ICommand RestartGraph => new CommandDelegate(param =>

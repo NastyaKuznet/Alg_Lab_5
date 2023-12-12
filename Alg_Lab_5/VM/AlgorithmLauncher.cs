@@ -29,9 +29,12 @@ namespace Alg_Lab_5.VM
         
         }
 
-        public void FindMaxThreadAcrossTrasportNet()
+        public void FindMaxThreadAcrossTrasportNet(Graph graph)
         {
-
+            FordFalcersonN fordFalcerson = new FordFalcersonN(graph);
+            //fordFalcerson.DoFordFalcerson();
+            Steps = fordFalcerson.Steps;
+            ButtonSteps = fordFalcerson.ButtonSteps;
         }
 
         public void BuildMinSpanningTree()

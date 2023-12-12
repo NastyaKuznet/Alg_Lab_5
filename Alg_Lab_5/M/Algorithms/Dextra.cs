@@ -219,7 +219,7 @@ namespace Alg_Lab_5.M.Algorithms
                     {
                         drawer.DrawDirectedLine(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1);
                     }
-                    else if (edge.Weight == 0 && edge.Type.Equals(TypeEdge.Directed))
+                    else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed))
                     {
                         drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
