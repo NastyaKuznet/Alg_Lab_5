@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -34,38 +35,52 @@ public class BfsAlgorithm
         BFS(queue, visitedVertices);
         GetCanvases();
     }
+
+    private List<NodeGraph> nodess = new List<NodeGraph>();
     private void BFS(Queue<NodeGraph> queue, bool[] visitedVertices)
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        
-        var first = queue.Peek();
-        stringBuilder.Append($"Ищем не пройденные вершины от начальной:{first.Name}");
+        NodeGraph tempcurrent = queue.Peek();
         while (queue.Count != 0)
         {
             var currentNode = queue.Dequeue();
             int count = 0;
+            StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append($"\nРассматриваем соседей вершины {currentNode.Name}\n");
+            visitedVertices[0] = true;
+            nodess.Clear();
+
             foreach(NodeGraph node in graph.NodeGraphs)
             {
                 foreach(Edge edge in node.Edges)
                 {
-                    if (visitedVertices[count] && IsContainEdge(edge, currentNode))
-                    {
-                        stringBuilder.Append($"\nВершина {node.Name} уже пройдена");
-                    }
                     if(!visitedVertices[count] && IsContainEdge(edge, currentNode))
                     {
                         graphs.Add(GetGraph(edge, graph));
-                        visitedVertices[count] = true;
                         stringBuilder.Append($"\n\nВершина {node.Name}\nЕщё не пройдена,\nпомечаем эту вершину пройденной - туда больше пути нет.");
                         comments.Add(stringBuilder.ToString());
+                        visitedVertices[count] = true;
                         queue.Enqueue(node);
+                        stringBuilder = new StringBuilder();
+                        stringBuilder.Append($"\nРассматриваем соседей вершины {currentNode.Name}\n");
+                        nodess.Add(node);
                     }
+                }
+                if (tempcurrent.Equals(currentNode))
+                {
+                    foreach (var nodeItem in nodess)
+                    {
+                        stringBuilder.Append($"\n\nВершина {nodeItem.Name}\nУже посещенная");
+
+                    }
+                }
+                else
+                {
+                    stringBuilder.Append($"\n\nВершина {node.Name}\nУже посещенная");
                 }
                 count++;
             }
+            tempcurrent = currentNode;
         }
-        
     }
     
     private bool IsContainEdge(Edge edge, NodeGraph node)
