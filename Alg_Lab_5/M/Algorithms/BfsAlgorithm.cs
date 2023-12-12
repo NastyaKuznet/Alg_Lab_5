@@ -40,46 +40,42 @@ public class BfsAlgorithm
     private void BFS(Queue<NodeGraph> queue, bool[] visitedVertices)
     {
         NodeGraph tempcurrent = queue.Peek();
+        List<NodeGraph> visited = new List<NodeGraph>();
+        visited.Clear();
+        visited.Add(queue.Peek());
         while (queue.Count != 0)
         {
             var currentNode = queue.Dequeue();
             int count = 0;
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append($"\nРассматриваем соседей вершины {currentNode.Name}\n");
+            stringBuilder.Append($"\nТекущая вершина: {currentNode.Name}\nИщем смежные непройденные вершины\n");
             visitedVertices[0] = true;
             nodess.Clear();
-
+            
             foreach(NodeGraph node in graph.NodeGraphs)
             {
+                stringBuilder.Append($"\nРассматриваем вершину:{node.Name}\n");
+                if (visited.Contains(node))
+                {
+                    stringBuilder.Append($"Состояние-пройдена\n");
+                }
+                
                 foreach(Edge edge in node.Edges)
                 {
                     if(!visitedVertices[count] && IsContainEdge(edge, currentNode))
                     {
                         graphs.Add(GetGraph(edge, graph));
-                        stringBuilder.Append($"\n\nВершина {node.Name}\nЕщё не пройдена,\nпомечаем эту вершину пройденной - туда больше пути нет.");
+                        stringBuilder.Append($"\nВершина {node.Name}-смежная\nЕщё не пройдена,\nпомечаем эту вершину пройденной - туда больше пути нет.");
                         comments.Add(stringBuilder.ToString());
                         visitedVertices[count] = true;
                         queue.Enqueue(node);
                         stringBuilder = new StringBuilder();
-                        stringBuilder.Append($"\nРассматриваем соседей вершины {currentNode.Name}\n");
-                        nodess.Add(node);
+                        stringBuilder.Append($"\nТекущая вершина: {currentNode.Name}\nИщем смежные непройденные вершины\n");
+                        visited.Add(node);
                     }
-                }
-                if (tempcurrent.Equals(currentNode))
-                {
-                    foreach (var nodeItem in nodess)
-                    {
-                        stringBuilder.Append($"\n\nВершина {nodeItem.Name}\nУже посещенная");
-
-                    }
-                }
-                else
-                {
-                    stringBuilder.Append($"\n\nВершина {node.Name}\nУже посещенная");
                 }
                 count++;
             }
-            tempcurrent = currentNode;
         }
     }
     
