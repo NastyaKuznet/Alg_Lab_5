@@ -88,7 +88,6 @@ namespace Alg_Lab_5.M.Algorithms
         private bool FindStock()
         {
             bool isThat = true;
-            int b;
             foreach (NodeGraph node in graph.NodeGraphs)
             {
                 foreach (Edge edge in node.Edges)
@@ -144,6 +143,7 @@ namespace Alg_Lab_5.M.Algorithms
 
                     itemsEdge[edge.Id].isVisited = false;
                     itemsNode[secondNode].isVisited = false;
+                    stackEdge.Pop();
 
                     CommetnBack(currentNode);
                 }
@@ -164,13 +164,12 @@ namespace Alg_Lab_5.M.Algorithms
 
         private void SetFlow()
         {
-            int currentFlow = 0;
-            currentFlow = MinFlow();
+            int currentFlow = MinFlow();
             pastFlow = currentFlow;
-            while (stackEdge.Count > 0)
+            foreach (ItemEdgeFord itemEdge in  stackEdge)
             {
-                ItemEdgeFord itemEdge = stackEdge.Pop();
-                itemEdge.flow = currentFlow;
+                
+                itemEdge.flow += currentFlow;
             }
             results.Add(currentFlow);
         }
@@ -193,7 +192,8 @@ namespace Alg_Lab_5.M.Algorithms
                 DrawGraph(newCanvas2);
                 Steps.Add(newCanvas2);
                 ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
-                Comments.Add($"Нельзя проложить поток, потому что поток у ребра {itemsEdge[edge.Id].flow} полностью закрывает его вес {edge.Weight} с вершинами {currentNode.Name} и {secondNode.Name}.");
+                Comments.Add($"Нельзя проложить поток, потому что поток у ребра {itemsEdge[edge.Id].flow} " +
+                    $"полностью закрывает его вес {edge.Weight} с вершинами {currentNode.Name} и {secondNode.Name}.");
             }
         }
 
@@ -203,7 +203,8 @@ namespace Alg_Lab_5.M.Algorithms
             DrawGraph(newCanvas);
             Steps.Add(newCanvas);
             ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
-            Comments.Add($"Пойдем по пути от вершины {currentNode.Name} до вершины {secondNode.Name}, так как по этому пути можно проложить " +
+            Comments.Add($"Пойдем по пути от вершины {currentNode.Name} до вершины {secondNode.Name}, " +
+                $"так как по этому пути можно проложить " +
                 $"поток.");
         }
 
@@ -251,11 +252,15 @@ namespace Alg_Lab_5.M.Algorithms
                 {
                     if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && !itemsEdge[edge.Id].isVisited)
                     {
-                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorForeGroundTextGraph, 1, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, 
+                            currentCanvas, ColorForeGroundTextGraph, 1, itemsEdge[edge.Id].flow + "/" + edge.Weight, 
+                            ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
                     else if (edge.Weight != 0 && edge.Type.Equals(TypeEdge.Directed) && itemsEdge[edge.Id].isVisited)
                     {
-                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY, currentCanvas, ColorStrokeSelectedNodeGraph, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
+                        drawer.DrawDirectedLineWeight(edge.FirstPosX, edge.FirstPosY, edge.SecondPosX, edge.SecondPosY,
+                            currentCanvas, ColorStrokeSelectedNodeGraph, 3, itemsEdge[edge.Id].flow + "/" + edge.Weight, 
+                            ColorStrokeRectangleOnEdgeGraph, ColorFillRectangleOnEndeGraph);
                     }
 
                     NodeGraph node1 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.FirstPosX, edge.FirstPosY);
@@ -270,9 +275,11 @@ namespace Alg_Lab_5.M.Algorithms
         private void DrawNode(Canvas currentCanvas, ItemNodeFord itemNode)
         {
             if (itemNode.isVisited)
-                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph, itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeSelectedNodeGraph,
+                    itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
             else
-                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
+                drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, 
+                    itemNode.node.PosX, itemNode.node.PosY, currentCanvas, itemNode.node.Name);
         
         }
     }
