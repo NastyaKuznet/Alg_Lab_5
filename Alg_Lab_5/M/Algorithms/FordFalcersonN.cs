@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
@@ -37,7 +36,7 @@ namespace Alg_Lab_5.M.Algorithms
         public List<Canvas> Steps = new List<Canvas>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
         public List<string> Comments = new List<string>();
-        bool flag = true;
+
         public FordFalcersonN(Graph graph)
         {
             this.graph = graph;
@@ -46,6 +45,7 @@ namespace Alg_Lab_5.M.Algorithms
             AddItems();
             DoFordFalcerson(source);
             Result = CheckSum();
+
             CommentFinal();
         }
 
@@ -65,9 +65,9 @@ namespace Alg_Lab_5.M.Algorithms
         private bool FindSource()
         {
             bool isThat = true;
-            foreach(NodeGraph node in graph.NodeGraphs)
+            foreach (NodeGraph node in graph.NodeGraphs)
             {
-                foreach(Edge edge in node.Edges)
+                foreach (Edge edge in node.Edges)
                 {
                     NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                     if (node2.Equals(node))
@@ -75,7 +75,7 @@ namespace Alg_Lab_5.M.Algorithms
                         isThat = false;
                     }
                 }
-                if(isThat)
+                if (isThat)
                 {
                     source = node;
                     return true;
@@ -88,7 +88,6 @@ namespace Alg_Lab_5.M.Algorithms
         private bool FindStock()
         {
             bool isThat = true;
-            int b;
             foreach (NodeGraph node in graph.NodeGraphs)
             {
                 foreach (Edge edge in node.Edges)
@@ -112,11 +111,11 @@ namespace Alg_Lab_5.M.Algorithms
 
         private void AddItems()
         {
-            foreach(NodeGraph node in graph.NodeGraphs)
+            foreach (NodeGraph node in graph.NodeGraphs)
             {
-                foreach(Edge edge in node.Edges)
+                foreach (Edge edge in node.Edges)
                 {
-                    if(!itemsEdge.ContainsKey(edge.Id))
+                    if (!itemsEdge.ContainsKey(edge.Id))
                         itemsEdge.Add(edge.Id, new ItemEdgeFord(edge));
                 }
                 itemsNode.Add(node, new ItemNodeFord(node));
@@ -125,7 +124,7 @@ namespace Alg_Lab_5.M.Algorithms
 
         private void DesignationsElements(NodeGraph currentNode)
         {
-            foreach(Edge edge in currentNode.Edges)
+            foreach (Edge edge in currentNode.Edges)
             {
                 NodeGraph secondNode = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                 if (secondNode.Equals(currentNode))
@@ -144,6 +143,7 @@ namespace Alg_Lab_5.M.Algorithms
 
                     itemsEdge[edge.Id].isVisited = false;
                     itemsNode[secondNode].isVisited = false;
+                    stackEdge.Pop();
 
                     CommetnBack(currentNode);
                 }
@@ -154,9 +154,9 @@ namespace Alg_Lab_5.M.Algorithms
         private int MinFlow()
         {
             int min = int.MaxValue;
-            foreach(ItemEdgeFord edge in stackEdge)
+            foreach (ItemEdgeFord edge in stackEdge)
             {
-                if(edge.edge.Weight - itemsEdge[edge.edge.Id].flow < min)
+                if (edge.edge.Weight - itemsEdge[edge.edge.Id].flow < min)
                     min = edge.edge.Weight - itemsEdge[edge.edge.Id].flow;
             }
             return min;
@@ -164,13 +164,12 @@ namespace Alg_Lab_5.M.Algorithms
 
         private void SetFlow()
         {
-            int currentFlow = 0;
-            currentFlow = MinFlow();
+            int currentFlow = MinFlow();
             pastFlow = currentFlow;
-            while (stackEdge.Count > 0)
+            foreach (ItemEdgeFord itemEdge in stackEdge)
             {
-                ItemEdgeFord itemEdge = stackEdge.Pop();
-                itemEdge.flow = currentFlow;
+
+                itemEdge.flow += currentFlow;
             }
             results.Add(currentFlow);
         }
@@ -178,7 +177,7 @@ namespace Alg_Lab_5.M.Algorithms
         private int CheckSum()
         {
             int sum = 0;
-            foreach(int result in results)
+            foreach (int result in results)
             {
                 sum += result;
             }

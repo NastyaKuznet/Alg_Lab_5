@@ -30,5 +30,12 @@ namespace Alg_Lab_5.M
         public static SolidColorBrush ColorFillForBfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#ff0000");
         public static SolidColorBrush ColorStrokeForBfs = (SolidColorBrush)new BrushConverter().ConvertFrom("#ff0000");
 
+        public static Algorithms.Dextra Dextra
+        {
+            get => default;
+            set
+            {
+            }
+        }
     }
 }

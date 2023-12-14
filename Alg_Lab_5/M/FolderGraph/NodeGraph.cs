@@ -15,6 +15,14 @@ namespace Alg_Lab_5.M.FolderGraph
 
         public List<Edge> Edges { get; set; } = new List<Edge>();
 
+        public Edge Edge
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         public NodeGraph(int id, string name, double posX, double posY)
         {
             Id = id;

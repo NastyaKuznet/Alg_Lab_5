@@ -446,7 +446,7 @@ namespace Alg_Lab_5.VM
                             NodeGraph node2 = drawer.FindNodeInTouch(graph.NodeGraphs, edge.SecondPosX, edge.SecondPosY);
                             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node1.PosX, node1.PosY, MainCanvas, node1.Name);
                             drawer.DrawEllipsWithName(SizeNodeGraph, SizeNodeGraph, ColorFillNodeGraph, ColorStrokeNodeGraph, node2.PosX, node2.PosY, MainCanvas, node2.Name);
-                            InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = edge.Type.Equals(TypeEdge.Directed), IsWeight = edge.Weight != 0});
+                            InfoEdges.Add(new EdgeGraphVM() { Id = edge.Id, FromTo = $"{node1.Name}->{node2.Name}", IsDirected = edge.Type.Equals(TypeEdge.Directed), IsWeight = edge.Weight != 0, Weight = edge.Weight});
                             ButtonEdge.Add(new Button() { CommandParameter = edge.Id, Content = "Изменить", Command = ChangeEdges });
                             ButtonCloseEdge.Add(new Button() { CommandParameter = edge.Id, Content = "X", IsEnabled = false, Command = DeleteEdges });
                         }
@@ -1242,5 +1242,6 @@ namespace Alg_Lab_5.VM
             fileProcessing.SaveGraph(pathFolder, graph);
             fileProcessing.SaveMatrix(pathFolder, new WorkerMatrix().CreateMatrix(graph.NodeGraphs));
         });
+
     }
 }

@@ -27,6 +27,22 @@ namespace Alg_Lab_5.M.Algorithms
             graphBefore = graph;
         }
 
+        public VM.MainVM MainVM
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
+        public VM.AlgorithmLauncher AlgorithmLauncher
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         public void GetSteps()
         {
             comments.Clear();

@@ -61,6 +61,7 @@ namespace Alg_Lab_5.M.Algorithms
             ButtonSteps.Add(new Button() { CommandParameter = Steps.Count - 1, Content = $"Шаг{numberStep++}" });
         }
 
+        
         public void DoDextra()
         {
             if (currentNode.Node.Equals(endNode))

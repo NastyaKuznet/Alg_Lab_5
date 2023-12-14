@@ -19,6 +19,22 @@ namespace Alg_Lab_5.VM
         public List<string> Comments = new List<string>();
         public ObservableCollection<Button> ButtonSteps = new ObservableCollection<Button>();
 
+        public MainWindow MainWindow
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
+        public KruskalAlgorithm KruskalAlgorithm
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         public void BypassWeightedGraphInWidth(Graph graph)
         {
             try
